@@ -828,24 +828,11 @@
 </head>
 <body>
 
-<!-- Shared mark -->
-<svg style="position:absolute;width:0;height:0" aria-hidden="true">
-  <defs>
-    <mask id="rw-mark-mask" maskUnits="userSpaceOnUse">
-      <rect x="10" y="30" width="60" height="60" rx="6" fill="#fff"/>
-      <rect x="30" y="10" width="60" height="60" rx="6" fill="#000"/>
-    </mask>
-    <symbol id="rw-mark" viewBox="0 0 100 100">
-      <rect x="10" y="30" width="60" height="60" rx="6" fill="#2DD4BF" mask="url(#rw-mark-mask)"/>
-      <rect x="30" y="10" width="60" height="60" rx="6" fill="none" stroke="#2DD4BF" stroke-width="3"/>
-    </symbol>
-  </defs>
-</svg>
 
 <!-- ── TOP BAR ── -->
 <div class="topbar">
   <a href="index.html" class="topbar-logo" aria-label="Runwell Co.">
-    <svg><use href="#rw-mark"/></svg>
+    <svg viewBox="0 0 100 100" fill="none" aria-hidden="true"><rect x="10" y="32" width="58" height="58" rx="7" fill="#2DD4BF"/><rect x="32" y="10" width="58" height="58" rx="7" fill="none" stroke="#2DD4BF" stroke-width="4"/></svg>
     <div class="divider"></div>
     <div>
       <div class="wm">RUNWELL</div>
