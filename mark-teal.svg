@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <mask id="rw-cutout-teal" maskUnits="userSpaceOnUse">
+      <rect x="10" y="30" width="60" height="60" rx="6" fill="#fff"></rect>
+      <rect x="30" y="10" width="60" height="60" rx="6" fill="#000"></rect>
+    </mask>
+  </defs>
+  <rect x="10" y="30" width="60" height="60" rx="6" fill="#2DD4BF" mask="url(#rw-cutout-teal)"></rect>
+  <rect x="30" y="10" width="60" height="60" rx="6" fill="none" stroke="#2DD4BF" stroke-width="3"></rect>
+</svg>
