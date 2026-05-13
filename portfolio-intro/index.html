@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #030b15;
+        font-family: 'Inter', 'DM Sans', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(rgba(29, 111, 232, 0.06) 1px, transparent 1px);
+        background-size: 36px 36px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── SCENES ── */
+      .scene {
+        position: absolute;
+        top: 0; left: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      #scene1 { z-index: 1; }
+      #scene2 { z-index: 2; opacity: 0; }
+      #scene3 { z-index: 3; opacity: 0; }
+      #scene4 { z-index: 4; opacity: 0; }
+      #scene5 { z-index: 5; opacity: 0; }
+      #scene6 { z-index: 6; opacity: 0; }
+
+      /* ── TWO-COLUMN SPLIT LAYOUT ── */
+      .scene-split {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 1920px;
+        height: 1080px;
+      }
+      .split-left {
+        width: 620px;
+        flex-shrink: 0;
+        padding: 80px 50px 80px 90px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 18px;
+      }
+      .split-sep {
+        width: 1px;
+        height: 600px;
+        flex-shrink: 0;
+        background: linear-gradient(to bottom,
+          transparent 0%,
+          rgba(29, 111, 232, 0.28) 25%,
+          rgba(29, 111, 232, 0.28) 75%,
+          transparent 100%);
+      }
+      .split-right {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 50px 70px 50px 50px;
+      }
+
+      /* ── SCENE 1: HOOK ── */
+      .hook-wrap {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 1920px;
+        height: 1080px;
+        padding: 140px 220px;
+        gap: 36px;
+      }
+      .hook-glow {
+        position: absolute;
+        top: 30%; right: 8%;
+        width: 860px; height: 700px;
+        background: radial-gradient(ellipse at center, rgba(29, 111, 232, 0.09) 0%, transparent 68%);
+        pointer-events: none;
+        z-index: 0;
+      }
+      .hook-tag {
+        font-family: 'Space Mono', 'Courier New', monospace;
+        font-size: 20px;
+        letter-spacing: 0.22em;
+        color: #3d7fde;
+        text-transform: uppercase;
+      }
+      .hook-headline {
+        font-size: 116px;
+        font-weight: 800;
+        line-height: 1.0;
+        letter-spacing: -0.025em;
+        color: #dce8f4;
+        max-width: 1300px;
+      }
+      .hook-headline .hl {
+        background: linear-gradient(130deg, #4d94ff 10%, #06c8e8 80%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hook-sub {
+        font-size: 38px;
+        font-weight: 400;
+        color: #5a7a98;
+        max-width: 860px;
+        line-height: 1.5;
+      }
+      .hook-rule {
+        width: 72px;
+        height: 4px;
+        background: linear-gradient(90deg, #1d6fe8, #06c8e8);
+        border-radius: 2px;
+      }
+
+      /* ── LEFT STAT PANEL ── */
+      .stat-tag {
+        font-family: 'Space Mono', 'Courier New', monospace;
+        font-size: 16px;
+        letter-spacing: 0.2em;
+        color: #3d7fde;
+        text-transform: uppercase;
+      }
+      .stat-rule {
+        width: 44px;
+        height: 3px;
+        background: linear-gradient(90deg, #1d6fe8, #06c8e8);
+        border-radius: 2px;
+      }
+      .stat-big {
+        font-size: 88px;
+        font-weight: 800;
+        line-height: 1.0;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #ffffff 30%, #5a9aff 80%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .stat-label {
+        font-size: 26px;
+        font-weight: 500;
+        color: #8aaac8;
+        line-height: 1.4;
+      }
+      .stat-context {
+        font-size: 19px;
+        font-weight: 400;
+        color: #3d5870;
+        line-height: 1.6;
+      }
+
+      /* ── MOCK WINDOW BASE ── */
+      .mock-window {
+        background: #040e1a;
+        border: 1px solid rgba(29, 111, 232, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow:
+          0 16px 64px rgba(0, 0, 0, 0.65),
+          0 0 0 1px rgba(255, 255, 255, 0.03),
+          0 0 48px rgba(29, 111, 232, 0.07);
+      }
+      .mock-bar {
+        background: #070f1a;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        height: 38px;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+      .dot-r { background: #ff5f56; }
+      .dot-y { background: #ffbd2e; }
+      .dot-g { background: #27c93f; }
+      .bar-ttl {
+        flex: 1;
+        text-align: center;
+        font-size: 13px;
+        color: #2e4d66;
+        letter-spacing: 0.07em;
+      }
+
+      /* ── SCENE 2: TRAINING ── */
+      .training-win { width: 1080px; }
+      .training-body {
+        display: flex;
+        height: 620px;
+      }
+      .tr-sidebar {
+        width: 272px;
+        background: #020a12;
+        border-right: 1px solid rgba(255, 255, 255, 0.04);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+      }
+      .tr-sidebar-hdr {
+        padding: 18px 20px 14px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        color: #1e4060;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .mod-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 20px;
+        font-size: 14px;
+        color: #2a4460;
+      }
+      .mod-item.done { color: #4a6a88; }
+      .mod-item.active {
+        background: rgba(29, 111, 232, 0.11);
+        color: #7aacd8;
+        border-right: 2px solid #1d6fe8;
+      }
+      .mod-chk {
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        background: #1d6fe8;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 9px; color: #fff;
+        flex-shrink: 0;
+      }
+      .mod-dot {
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        flex-shrink: 0;
+      }
+      .mod-arr {
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        background: rgba(29, 111, 232, 0.22);
+        flex-shrink: 0;
+      }
+      .tr-content {
+        flex: 1;
+        padding: 30px 34px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .tr-mod-num {
+        font-size: 11px;
+        letter-spacing: 0.13em;
+        color: #1e4060;
+        text-transform: uppercase;
+      }
+      .tr-mod-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #c0d8ec;
+        line-height: 1.2;
+      }
+      .tr-mod-body {
+        font-size: 17px;
+        color: #3a5870;
+        line-height: 1.65;
+        flex: 1;
+      }
+      .tr-concept {
+        background: rgba(29, 111, 232, 0.08);
+        border: 1px solid rgba(29, 111, 232, 0.18);
+        border-radius: 6px;
+        padding: 12px 16px;
+      }
+      .tr-concept-lbl {
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        color: #3d7fde;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+      }
+      .tr-concept-txt {
+        font-size: 16px;
+        font-weight: 600;
+        color: #6aaad4;
+      }
+      .tr-progress-wrap { margin-top: auto; }
+      .tr-progress-lbl {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #1e4060;
+        margin-bottom: 6px;
+      }
+      .tr-progress-track {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .tr-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #1d6fe8, #06c8e8);
+        border-radius: 2px;
+        width: 24%;
+      }
+
+      /* ── SCENE 3: GMAIL AI ── */
+      .gmail-win { width: 1080px; }
+      .gmail-body {
+        display: flex;
+        height: 620px;
+      }
+      .gm-list {
+        width: 310px;
+        background: #020a12;
+        border-right: 1px solid rgba(255, 255, 255, 0.04);
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .gm-list-hdr {
+        padding: 16px 18px 12px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: #1e4060;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .email-row {
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        cursor: default;
+      }
+      .email-row.active { background: rgba(29, 111, 232, 0.09); }
+      .email-from {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a6888;
+        margin-bottom: 3px;
+      }
+      .email-row.active .email-from { color: #8ab0d4; }
+      .email-subj {
+        font-size: 12px;
+        color: #2e4a64;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 2px;
+      }
+      .email-time { font-size: 10px; color: #1a3048; }
+      .gm-view {
+        flex: 1;
+        padding: 26px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+      }
+      .gm-subject {
+        font-size: 21px;
+        font-weight: 700;
+        color: #bcd4ea;
+      }
+      .gm-from-line { font-size: 12px; color: #2e4a64; }
+      .gm-body-txt {
+        font-size: 16px;
+        color: #3a5870;
+        line-height: 1.65;
+        flex: 1;
+      }
+      .ai-badge {
+        background: rgba(29, 111, 232, 0.1);
+        border: 1px solid rgba(29, 111, 232, 0.28);
+        border-radius: 8px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .ai-badge-icon {
+        width: 34px; height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1d6fe8, #06c8e8);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 700; color: #fff;
+        flex-shrink: 0;
+      }
+      .ai-badge-body { flex: 1; }
+      .ai-badge-lbl {
+        font-size: 14px;
+        font-weight: 700;
+        color: #6aaad4;
+        margin-bottom: 2px;
+      }
+      .ai-badge-sub { font-size: 11px; color: #2e4a64; }
+      .ai-badge-ck { font-size: 18px; color: #27c93f; }
+
+      /* ── SCENE 4: SALES REP ── */
+      .sales-win { width: 1080px; }
+      .sales-body {
+        padding: 22px 26px;
+        height: 620px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .sales-hdr {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .sales-ttl {
+        font-size: 18px;
+        font-weight: 700;
+        color: #8ab0d4;
+      }
+      .sales-meta {
+        font-size: 11px;
+        color: #1e4060;
+        font-family: 'Space Mono', 'Courier New', monospace;
+      }
+      .prospect-row {
+        display: flex;
+        gap: 14px;
+        flex: 1;
+      }
+      .pcard {
+        flex: 1;
+        background: #060f1c;
+        border: 1px solid rgba(29, 111, 232, 0.13);
+        border-radius: 8px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .pcard-co {
+        font-size: 16px;
+        font-weight: 700;
+        color: #bcd4ea;
+      }
+      .pcard-loc { font-size: 11px; color: #1e4060; }
+      .pcard-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        width: fit-content;
+      }
+      .pcard-badge.icp {
+        background: rgba(29, 111, 232, 0.14);
+        color: #4d90f8;
+        border: 1px solid rgba(29, 111, 232, 0.28);
+      }
+      .pcard-badge.strong {
+        background: rgba(29, 200, 100, 0.09);
+        color: #3dd68c;
+        border: 1px solid rgba(29, 200, 100, 0.22);
+      }
+      .pcard-size { font-size: 12px; color: #2e4a64; }
+      .pcard-div { height: 1px; background: rgba(255, 255, 255, 0.04); }
+      .pcard-contact { font-size: 14px; color: #4a6888; font-weight: 600; }
+      .pcard-role { font-size: 11px; color: #1e4060; }
+      .pcard-status {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #27c93f;
+      }
+      .pcard-status.pending { color: #4d90f8; }
+      .sales-footer {
+        display: flex;
+        gap: 28px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .sales-stat {
+        font-size: 12px;
+        color: #1e4060;
+        font-family: 'Space Mono', 'Courier New', monospace;
+      }
+      .sales-stat span { color: #4d90f8; font-weight: 700; }
+
+      /* ── SCENE 5: CHATBOT ── */
+      .chat-win { width: 960px; }
+      .chat-appbar {
+        background: #060f1a;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        height: 50px;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .chat-appbar-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #8ab0d4;
+        flex: 1;
+      }
+      .online-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: #27c93f;
+        box-shadow: 0 0 6px #27c93f;
+      }
+      .online-txt { font-size: 12px; color: #27c93f; }
+      .chat-body {
+        padding: 26px 26px 20px;
+        height: 572px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .chat-msgs {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        justify-content: flex-end;
+      }
+      .msg-row { display: flex; gap: 10px; }
+      .msg-row.user { justify-content: flex-end; }
+      .msg-bubble {
+        max-width: 82%;
+        border-radius: 12px;
+        padding: 14px 18px;
+        font-size: 16px;
+        line-height: 1.55;
+      }
+      .msg-bubble.user {
+        background: rgba(29, 111, 232, 0.22);
+        border: 1px solid rgba(29, 111, 232, 0.38);
+        color: #bcd4ea;
+        border-radius: 12px 12px 2px 12px;
+      }
+      .msg-bubble.ai {
+        background: #060f1a;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: #7a9cc0;
+        border-radius: 12px 12px 12px 2px;
+      }
+      .ai-steps {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .ai-step {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 15px;
+        color: #6a8aac;
+      }
+      .step-num {
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        background: rgba(29, 111, 232, 0.18);
+        border: 1px solid rgba(29, 111, 232, 0.32);
+        font-size: 11px; color: #4d90f8;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; margin-top: 1px;
+      }
+      .chat-input-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .chat-input-box {
+        flex: 1;
+        background: #060f1a;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 8px;
+        padding: 13px 18px;
+        font-size: 15px;
+        color: #1e4060;
+      }
+      .chat-send-btn {
+        background: #1d6fe8;
+        border-radius: 8px;
+        padding: 13px 22px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      /* ── SCENE 6: CTA ── */
+      .cta-wrap {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 1920px;
+        height: 1080px;
+        padding: 140px 220px;
+        gap: 34px;
+      }
+      .cta-glow {
+        position: absolute;
+        top: 25%; right: 8%;
+        width: 820px; height: 680px;
+        background: radial-gradient(ellipse at center, rgba(29, 111, 232, 0.08) 0%, transparent 68%);
+        pointer-events: none;
+        z-index: 0;
+      }
+      .cta-tag {
+        font-family: 'Space Mono', 'Courier New', monospace;
+        font-size: 19px;
+        letter-spacing: 0.22em;
+        color: #3d7fde;
+        text-transform: uppercase;
+      }
+      .cta-name {
+        font-size: 108px;
+        font-weight: 800;
+        line-height: 1.0;
+        letter-spacing: -0.022em;
+        color: #dce8f4;
+      }
+      .cta-title {
+        font-size: 42px;
+        font-weight: 400;
+        color: #5a7a98;
+        line-height: 1.35;
+      }
+      .cta-rule {
+        width: 72px;
+        height: 3px;
+        background: linear-gradient(90deg, #1d6fe8, #06c8e8);
+        border-radius: 2px;
+      }
+      .cta-link {
+        font-family: 'Space Mono', 'Courier New', monospace;
+        font-size: 25px;
+        color: #3d7fde;
+        letter-spacing: 0.03em;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="35"
+      data-width="1920"
+      data-height="1080"
+    >
+
+      <!-- ── SCENE 1: HOOK ── -->
+      <div id="scene1" class="scene">
+        <div class="hook-glow"></div>
+        <div class="hook-wrap">
+          <div id="h-tag" class="hook-tag">AI Automation · Cameron Montbriand</div>
+          <div id="h-head" class="hook-headline">
+            <span class="hl">14 hours</span> of manual<br>work a week. Automated.
+          </div>
+          <div id="h-sub" class="hook-sub">Here's what I built — and what it's worth.</div>
+          <div id="h-rule" class="hook-rule"></div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 2: TRAINING SYSTEM ── -->
+      <div id="scene2" class="scene">
+        <div class="scene-split">
+          <div class="split-left">
+            <div id="s2-tag" class="stat-tag">Enterprise Training</div>
+            <div id="s2-rule" class="stat-rule"></div>
+            <div id="s2-num" class="stat-big">$10K+</div>
+            <div id="s2-lbl" class="stat-label">saved vs. vendor-produced training</div>
+            <div id="s2-ctx" class="stat-context">84 interactive modules built in-house from 111 service manuals. A full 12-bucket program a training vendor would charge $10,000+ to produce.</div>
+          </div>
+          <div id="s2-sep" class="split-sep"></div>
+          <div class="split-right">
+            <div id="s2-mock" class="mock-window training-win">
+              <div class="mock-bar">
+                <div class="dot dot-r"></div>
+                <div class="dot dot-y"></div>
+                <div class="dot dot-g"></div>
+                <div class="bar-ttl">Cloos Trainer — QIROX Foundation</div>
+              </div>
+              <div class="training-body">
+                <div class="tr-sidebar">
+                  <div class="tr-sidebar-hdr">QIROX Foundation</div>
+                  <div class="mod-item done"><div class="mod-chk">✓</div>1. System Overview</div>
+                  <div class="mod-item done"><div class="mod-chk">✓</div>2. Controller Variants</div>
+                  <div class="mod-item done"><div class="mod-chk">✓</div>3. Teach Pendant</div>
+                  <div class="mod-item done"><div class="mod-chk">✓</div>4. Operating Modes</div>
+                  <div class="mod-item done"><div class="mod-chk">✓</div>5. Drives On</div>
+                  <div class="mod-item active"><div class="mod-arr"></div>6. Coordinate Systems</div>
+                  <div class="mod-item"><div class="mod-dot"></div>7. TCP / TOV</div>
+                  <div class="mod-item"><div class="mod-dot"></div>8. Teach Mode</div>
+                  <div class="mod-item"><div class="mod-dot"></div>9. Jogging</div>
+                  <div class="mod-item"><div class="mod-dot"></div>10. CAROLA Basics</div>
+                </div>
+                <div class="tr-content">
+                  <div class="tr-mod-num">Module 6 of 25 · QIROX Foundation</div>
+                  <div class="tr-mod-title">Coordinate Systems</div>
+                  <div class="tr-mod-body">Before jogging the robot, you must understand how the QIROX interprets space through its coordinate systems. Each frame defines how the robot translates joint movement into linear motion in the real world.</div>
+                  <div class="tr-concept">
+                    <div class="tr-concept-lbl">Key Concept</div>
+                    <div class="tr-concept-txt">World Frame vs. Tool Frame vs. User Frame</div>
+                  </div>
+                  <div class="tr-progress-wrap">
+                    <div class="tr-progress-lbl"><span>Module Progress</span><span>6 / 25 complete</span></div>
+                    <div class="tr-progress-track"><div class="tr-progress-fill"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 3: GMAIL AI SUPPORT ── -->
+      <div id="scene3" class="scene">
+        <div class="scene-split">
+          <div class="split-left">
+            <div id="s3-tag" class="stat-tag">Support Automation</div>
+            <div id="s3-rule" class="stat-rule"></div>
+            <div id="s3-num" class="stat-big">4 hrs/wk</div>
+            <div id="s3-lbl" class="stat-label">returned to your service team</div>
+            <div id="s3-ctx" class="stat-context">Every support email gets a Claude-drafted reply — pulled from the full knowledge base. A human reviews before it sends. Nobody stares at a blank page again.</div>
+          </div>
+          <div id="s3-sep" class="split-sep"></div>
+          <div class="split-right">
+            <div id="s3-mock" class="mock-window gmail-win">
+              <div class="mock-bar">
+                <div class="dot dot-r"></div>
+                <div class="dot dot-y"></div>
+                <div class="dot dot-g"></div>
+                <div class="bar-ttl">Support Inbox — Gmail</div>
+              </div>
+              <div class="gmail-body">
+                <div class="gm-list">
+                  <div class="gm-list-hdr">Inbox — Support (3 unread)</div>
+                  <div class="email-row">
+                    <div class="email-from">Mike Chen</div>
+                    <div class="email-subj">Re: Fault Code 1052 — QDS cell</div>
+                    <div class="email-time">9:42 AM</div>
+                  </div>
+                  <div class="email-row active">
+                    <div class="email-from">Apex Manufacturing</div>
+                    <div class="email-subj">Wire feed error on Qineo Next</div>
+                    <div class="email-time">8:15 AM</div>
+                  </div>
+                  <div class="email-row">
+                    <div class="email-from">K. Wilson</div>
+                    <div class="email-subj">Coolant leak — QIROX cell, urgent</div>
+                    <div class="email-time">Yesterday</div>
+                  </div>
+                </div>
+                <div class="gm-view">
+                  <div class="gm-subject">Wire feed error on Qineo Next</div>
+                  <div class="gm-from-line">From: apex@manufacturing.com · 8:15 AM</div>
+                  <div class="gm-body-txt">"Hi — our Qineo Next is showing wire feed alarm F.2003 on startup. Already checked the drive unit, no visible jams. Wire spool looks fine. Cell has been down 2 hours and we have parts due this afternoon..."</div>
+                  <div id="s3-badge" class="ai-badge">
+                    <div class="ai-badge-icon">AI</div>
+                    <div class="ai-badge-body">
+                      <div class="ai-badge-lbl">AI Draft Ready</div>
+                      <div class="ai-badge-sub">Based on 3 knowledge base documents · Claude-generated · Awaiting human review</div>
+                    </div>
+                    <div class="ai-badge-ck">✓</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 4: SALES REP AI ── -->
+      <div id="scene4" class="scene">
+        <div class="scene-split">
+          <div class="split-left">
+            <div id="s4-tag" class="stat-tag">Sales Rep AI</div>
+            <div id="s4-rule" class="stat-rule"></div>
+            <div id="s4-num" class="stat-big">10 hrs/wk</div>
+            <div id="s4-lbl" class="stat-label">of prospect research. Automated.</div>
+            <div id="s4-ctx" class="stat-context">11-state territory. AI qualifies companies, finds verified contacts, and writes them straight into HubSpot — every week, zero manual input.</div>
+          </div>
+          <div id="s4-sep" class="split-sep"></div>
+          <div class="split-right">
+            <div id="s4-mock" class="mock-window sales-win">
+              <div class="mock-bar">
+                <div class="dot dot-r"></div>
+                <div class="dot dot-y"></div>
+                <div class="dot dot-g"></div>
+                <div class="bar-ttl">Weekly Territory Report — May 12, 2026</div>
+              </div>
+              <div class="sales-body">
+                <div class="sales-hdr">
+                  <div class="sales-ttl">Qualified Prospects This Week</div>
+                  <div class="sales-meta">Run: Mon 06:00 AM · 11 states</div>
+                </div>
+                <div class="prospect-row">
+                  <div class="pcard" id="pc1">
+                    <div class="pcard-co">Acme Robotics</div>
+                    <div class="pcard-loc">Phoenix, AZ</div>
+                    <div class="pcard-badge icp">★ ICP Match</div>
+                    <div class="pcard-size">450+ employees · Automotive</div>
+                    <div class="pcard-div"></div>
+                    <div class="pcard-contact">J. Martinez</div>
+                    <div class="pcard-role">VP of Operations</div>
+                    <div class="pcard-status">✓ Added to HubSpot</div>
+                  </div>
+                  <div class="pcard" id="pc2">
+                    <div class="pcard-co">Atlas Mfg Co.</div>
+                    <div class="pcard-loc">Detroit, MI</div>
+                    <div class="pcard-badge icp">★ ICP Match</div>
+                    <div class="pcard-size">320 employees · Heavy Mfg</div>
+                    <div class="pcard-div"></div>
+                    <div class="pcard-contact">R. Thompson</div>
+                    <div class="pcard-role">Plant Manager</div>
+                    <div class="pcard-status">✓ Added to HubSpot</div>
+                  </div>
+                  <div class="pcard" id="pc3">
+                    <div class="pcard-co">Precision Weld LLC</div>
+                    <div class="pcard-loc">Houston, TX</div>
+                    <div class="pcard-badge strong">Strong Fit</div>
+                    <div class="pcard-size">200+ employees · Oil &amp; Gas</div>
+                    <div class="pcard-div"></div>
+                    <div class="pcard-contact">K. Davis</div>
+                    <div class="pcard-role">Engineering Director</div>
+                    <div class="pcard-status pending">↻ Researching...</div>
+                  </div>
+                </div>
+                <div class="sales-footer">
+                  <div class="sales-stat"><span>47</span> companies qualified</div>
+                  <div class="sales-stat"><span>23</span> new HubSpot contacts</div>
+                  <div class="sales-stat"><span>11</span> states covered</div>
+                  <div class="sales-stat"><span>0</span> hours of manual work</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 5: AI SERVICE CHATBOT ── -->
+      <div id="scene5" class="scene">
+        <div class="scene-split">
+          <div class="split-left">
+            <div id="s5-tag" class="stat-tag">AI Service Chatbot</div>
+            <div id="s5-rule" class="stat-rule"></div>
+            <div id="s5-num" class="stat-big">111</div>
+            <div id="s5-lbl" class="stat-label">service manuals. One question away.</div>
+            <div id="s5-ctx" class="stat-context">Technicians ask any question in plain English. The AI searches every manual and returns step-by-step guidance instantly — no hunting through PDFs, no calling back to HQ.</div>
+          </div>
+          <div id="s5-sep" class="split-sep"></div>
+          <div class="split-right">
+            <div id="s5-mock" class="mock-window chat-win">
+              <div class="chat-appbar">
+                <div class="chat-appbar-title">Cloos AI Assistant</div>
+                <div class="online-dot"></div>
+                <div class="online-txt">Online</div>
+              </div>
+              <div class="chat-body">
+                <div class="chat-msgs">
+                  <div class="msg-row user" id="c-q">
+                    <div class="msg-bubble user">My QIROX is showing fault 1052 on startup. What does that mean and how do I fix it?</div>
+                  </div>
+                  <div class="msg-row" id="c-a">
+                    <div class="msg-bubble ai">
+                      <div>Fault 1052 is a drive enable failure. Here's how to resolve it:</div>
+                      <div class="ai-steps">
+                        <div class="ai-step"><div class="step-num">1</div><div>Check the E-stop circuit — all segments must be in RUN position before drives can enable</div></div>
+                        <div class="ai-step"><div class="step-num">2</div><div>Navigate to DIAGNOSTICS &gt; Drive Status and confirm each axis shows READY state</div></div>
+                        <div class="ai-step"><div class="step-num">3</div><div>If fault persists after reset, inspect I/O board connector X14 for loose contact or damage</div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="chat-input-row">
+                  <div class="chat-input-box">Type your question...</div>
+                  <div class="chat-send-btn">→</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENE 6: CTA ── -->
+      <div id="scene6" class="scene">
+        <div class="cta-glow"></div>
+        <div class="cta-wrap">
+          <div id="c-tag" class="cta-tag">AI Automation · Industrial Business</div>
+          <div id="c-name" class="cta-name">Cameron<br>Montbriand</div>
+          <div id="c-title" class="cta-title">Building AI systems that handle<br>the work nobody has time for.</div>
+          <div id="c-rule" class="cta-rule"></div>
+          <div id="c-link" class="cta-link">linkedin.com/in/cameron-montbriand-ab685216b</div>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      // ── SCENE 1: Hook (0–4s) ──
+      tl.from("#h-tag",  { y: 24, opacity: 0, duration: 0.7,  ease: "power3.out" }, 0.2);
+      tl.from("#h-head", { y: 56, opacity: 0, duration: 1.0,  ease: "expo.out"   }, 0.45);
+      tl.from("#h-sub",  { y: 28, opacity: 0, duration: 0.8,  ease: "power2.out" }, 1.0);
+      tl.from("#h-rule", { scaleX: 0, transformOrigin: "left center", duration: 0.7, ease: "power3.out" }, 1.35);
+
+      // ── TRANSITION 1→2 (t=4.0) ──
+      var T1 = 4.0;
+      tl.to("#scene1", { opacity: 0, duration: 0.65, overwrite: "auto" }, T1);
+      tl.set("#scene1", { visibility: "hidden" }, T1 + 0.65);
+      tl.to("#scene2", { opacity: 1, duration: 0.65, overwrite: "auto" }, T1 + 0.12);
+
+      // ── SCENE 2: Training (4.5–10s) ──
+      tl.from("#s2-tag",  { y: 20, opacity: 0, duration: 0.55, ease: "power3.out"    }, T1 + 0.35);
+      tl.from("#s2-rule", { scaleX: 0, transformOrigin: "left center", duration: 0.5, ease: "power2.out" }, T1 + 0.5);
+      tl.from("#s2-num",  { y: 32, opacity: 0, duration: 0.72, ease: "back.out(1.5)" }, T1 + 0.6);
+      tl.from("#s2-lbl",  { y: 20, opacity: 0, duration: 0.55, ease: "power2.out"    }, T1 + 1.0);
+      tl.from("#s2-ctx",  { y: 18, opacity: 0, duration: 0.55, ease: "power2.out"    }, T1 + 1.2);
+      tl.from("#s2-sep",  { scaleY: 0, transformOrigin: "top center", duration: 0.75, ease: "power3.out" }, T1 + 0.5);
+      tl.from("#s2-mock", { x: 55, opacity: 0, duration: 0.85, ease: "power3.out"    }, T1 + 0.62);
+
+      // ── TRANSITION 2→3 (t=10.0) ──
+      var T2 = 10.0;
+      tl.to("#scene2", { opacity: 0, duration: 0.65, overwrite: "auto" }, T2);
+      tl.set("#scene2", { visibility: "hidden" }, T2 + 0.65);
+      tl.to("#scene3", { opacity: 1, duration: 0.65, overwrite: "auto" }, T2 + 0.12);
+
+      // ── SCENE 3: Gmail AI (10.5–16s) ──
+      tl.from("#s3-tag",   { y: 20, opacity: 0, duration: 0.55, ease: "power3.out"    }, T2 + 0.35);
+      tl.from("#s3-rule",  { scaleX: 0, transformOrigin: "left center", duration: 0.5, ease: "power2.out" }, T2 + 0.5);
+      tl.from("#s3-num",   { y: 32, opacity: 0, duration: 0.72, ease: "back.out(1.5)" }, T2 + 0.6);
+      tl.from("#s3-lbl",   { y: 20, opacity: 0, duration: 0.55, ease: "power2.out"    }, T2 + 1.0);
+      tl.from("#s3-ctx",   { y: 18, opacity: 0, duration: 0.55, ease: "power2.out"    }, T2 + 1.2);
+      tl.from("#s3-sep",   { scaleY: 0, transformOrigin: "top center", duration: 0.75, ease: "power3.out" }, T2 + 0.5);
+      tl.from("#s3-mock",  { x: 55, opacity: 0, duration: 0.85, ease: "power3.out"    }, T2 + 0.62);
+      tl.from("#s3-badge", { y: 14, opacity: 0, duration: 0.55, ease: "back.out(1.4)" }, T2 + 1.55);
+
+      // ── TRANSITION 3→4 (t=16.0) ──
+      var T3 = 16.0;
+      tl.to("#scene3", { opacity: 0, duration: 0.65, overwrite: "auto" }, T3);
+      tl.set("#scene3", { visibility: "hidden" }, T3 + 0.65);
+      tl.to("#scene4", { opacity: 1, duration: 0.65, overwrite: "auto" }, T3 + 0.12);
+
+      // ── SCENE 4: Sales Rep (16.5–22s) ──
+      tl.from("#s4-tag",  { y: 20, opacity: 0, duration: 0.55, ease: "power3.out"    }, T3 + 0.35);
+      tl.from("#s4-rule", { scaleX: 0, transformOrigin: "left center", duration: 0.5, ease: "power2.out" }, T3 + 0.5);
+      tl.from("#s4-num",  { y: 32, opacity: 0, duration: 0.72, ease: "back.out(1.5)" }, T3 + 0.6);
+      tl.from("#s4-lbl",  { y: 20, opacity: 0, duration: 0.55, ease: "power2.out"    }, T3 + 1.0);
+      tl.from("#s4-ctx",  { y: 18, opacity: 0, duration: 0.55, ease: "power2.out"    }, T3 + 1.2);
+      tl.from("#s4-sep",  { scaleY: 0, transformOrigin: "top center", duration: 0.75, ease: "power3.out" }, T3 + 0.5);
+      tl.from("#s4-mock", { x: 55, opacity: 0, duration: 0.85, ease: "power3.out"    }, T3 + 0.62);
+      tl.from("#pc1",     { y: 22, opacity: 0, duration: 0.48, ease: "power2.out"    }, T3 + 1.05);
+      tl.from("#pc2",     { y: 22, opacity: 0, duration: 0.48, ease: "power2.out"    }, T3 + 1.2);
+      tl.from("#pc3",     { y: 22, opacity: 0, duration: 0.48, ease: "power2.out"    }, T3 + 1.35);
+
+      // ── TRANSITION 4→5 (t=22.0) ──
+      var T4 = 22.0;
+      tl.to("#scene4", { opacity: 0, duration: 0.65, overwrite: "auto" }, T4);
+      tl.set("#scene4", { visibility: "hidden" }, T4 + 0.65);
+      tl.to("#scene5", { opacity: 1, duration: 0.65, overwrite: "auto" }, T4 + 0.12);
+
+      // ── SCENE 5: Chatbot (22.5–28s) ──
+      tl.from("#s5-tag",  { y: 20, opacity: 0, duration: 0.55, ease: "power3.out"    }, T4 + 0.35);
+      tl.from("#s5-rule", { scaleX: 0, transformOrigin: "left center", duration: 0.5, ease: "power2.out" }, T4 + 0.5);
+      tl.from("#s5-num",  { y: 32, opacity: 0, duration: 0.72, ease: "back.out(1.5)" }, T4 + 0.6);
+      tl.from("#s5-lbl",  { y: 20, opacity: 0, duration: 0.55, ease: "power2.out"    }, T4 + 1.0);
+      tl.from("#s5-ctx",  { y: 18, opacity: 0, duration: 0.55, ease: "power2.out"    }, T4 + 1.2);
+      tl.from("#s5-sep",  { scaleY: 0, transformOrigin: "top center", duration: 0.75, ease: "power3.out" }, T4 + 0.5);
+      tl.from("#s5-mock", { x: 55, opacity: 0, duration: 0.85, ease: "power3.out"    }, T4 + 0.62);
+      tl.from("#c-q",     { y: 16, opacity: 0, duration: 0.5,  ease: "power2.out"    }, T4 + 1.1);
+      tl.from("#c-a",     { y: 16, opacity: 0, duration: 0.65, ease: "power2.out"    }, T4 + 1.65);
+
+      // ── TRANSITION 5→6 (t=28.0) ──
+      var T5 = 28.0;
+      tl.to("#scene5", { opacity: 0, duration: 0.65, overwrite: "auto" }, T5);
+      tl.set("#scene5", { visibility: "hidden" }, T5 + 0.65);
+      tl.to("#scene6", { opacity: 1, duration: 0.65, overwrite: "auto" }, T5 + 0.12);
+
+      // ── SCENE 6: CTA (28.5–35s) — final scene ──
+      tl.from("#c-tag",   { y: 20, opacity: 0, duration: 0.55, ease: "power3.out"   }, T5 + 0.32);
+      tl.from("#c-name",  { y: 44, opacity: 0, duration: 0.85, ease: "expo.out"     }, T5 + 0.52);
+      tl.from("#c-title", { y: 24, opacity: 0, duration: 0.65, ease: "power2.out"   }, T5 + 0.9);
+      tl.from("#c-rule",  { scaleX: 0, transformOrigin: "left center", duration: 0.55, ease: "power2.out" }, T5 + 1.15);
+      tl.from("#c-link",  { y: 18, opacity: 0, duration: 0.55, ease: "power2.out"   }, T5 + 1.38);
+      // Final fade to black
+      tl.to("#scene6", { opacity: 0, duration: 0.85, overwrite: "auto" }, 34.0);
+      tl.set("#scene6", { visibility: "hidden" }, 35.0);
+
+      window.__timelines["main"] = tl;
+
+      // Auto-play when viewed directly in browser (Hyperframes render engine controls via __timelines)
+      if (typeof window.__hfSeek === 'undefined') {
+        setTimeout(function() { tl.play(); }, 400);
+      }
+    </script>
+  </body>
+</html>

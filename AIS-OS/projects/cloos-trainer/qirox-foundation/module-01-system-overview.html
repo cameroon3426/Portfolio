@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M01: System Overview — QIROX Foundation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="back-link">&#8592; Trail Index</a>
+    <div class="topbar-title">M01: System Overview</div>
+  </div>
+  <div class="topbar-progress">Module 1 of 25</div>
+</div>
+
+<div class="layout">
+<div class="main">
+
+  <div class="stepper">
+
+    <!-- Step 0: Intro + Objectives -->
+    <div class="step active" data-label="Objectives">
+      <div class="mod-header">
+        <h1>Module 01 — System Overview</h1>
+        <p>The complete picture of a QIROX robotic welding cell: robot models, controller variants, teach pendant, positioners, and how every component connects into a working system.</p>
+        <div class="tag-row">
+          <span class="tag orange">L1 Foundation</span>
+          <span class="tag">~15 min</span>
+          <span class="tag">CommL1 · FSTL1 · AppEng · OnProg · OffProg</span>
+          <span class="tag">PA_Qirox_V7 · QS2.12</span>
+        </div>
+      </div>
+      <div class="objectives">
+        <h3>Learning Objectives</h3>
+        <ul>
+          <li>Identify the three QRC robot model families and their payload/reach classifications</li>
+          <li>Describe the major components of a QIROX robotic welding cell</li>
+          <li>Explain the relationship between the robot mechanics, controller, teach pendant, and power source</li>
+          <li>Recognize which controller variant (QC2.02 Advanced, Master, Expert) applies to a given system</li>
+          <li>Understand the axis numbering convention and working range concept for QIROX robots</li>
+        </ul>
+      </div>
+      <div class="callout callout-tip">
+        <div class="callout-label">How this module works</div>
+        Use the <strong>Next</strong> button below to move through each section one at a time. Use <strong>Back</strong> to review any section before the quiz. Keyboard arrow keys also work.
+      </div>
+    </div>
+
+    <!-- Step 1: Robot Family -->
+    <div class="step" data-label="Robot Family">
+      <div class="section">
+        <div class="section-num">Section 1</div>
+        <h2>The QIROX Robot Family</h2>
+        <p>CLOOS QIROX robots are purpose-built for industrial welding. The QRC series covers three size classes — 320, 350, and 410 — defined by reach radius and payload capacity. All share the same 6-axis articulated arm design and the same CAROLA programming language.</p>
+
+        <div class="img-row">
+          <div class="img-block">
+            <img src="images/m01-qrc-models.png" alt="QRC 320, 350, and 410 robot models" class="training-img">
+            <div class="img-caption">QRC model family — QRC 320, 350, and 410 shown side by side. Larger number = greater reach and payload. Source: PA_Qirox_QS2.12</div>
+          </div>
+          <div class="img-block">
+            <img src="images/m01-robot-axes-qs.png" alt="QIROX robot axes diagram" class="training-img">
+            <div class="img-caption">Six-axis articulated arm. Axes A1–A6 are named sequentially from base to wrist. Source: PA_Qirox_QS2.12</div>
+          </div>
+        </div>
+
+        <table>
+          <tr><th>Model</th><th>Reach Radius</th><th>Payload</th><th>Typical Use</th></tr>
+          <tr><td><strong>QRC 320</strong></td><td>~1,600 mm</td><td>Up to 6 kg</td><td>Light-duty single-torch welding, compact cells</td></tr>
+          <tr><td><strong>QRC 350</strong></td><td>~2,000 mm</td><td>Up to 8 kg</td><td>Standard torch + seam tracking sensor</td></tr>
+          <tr><td><strong>QRC 410</strong></td><td>~2,500 mm</td><td>Up to 10 kg</td><td>Extended reach, positioner cells, heavy torch setups</td></tr>
+        </table>
+
+        <div class="callout callout-tip">
+          <div class="callout-label">Tip</div>
+          The model number encodes the arm reach class, not an arbitrary product code. Always check the actual technical data sheet for the certified working range of the specific robot serial number on-site.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: System Architecture -->
+    <div class="step" data-label="System Architecture">
+      <div class="section">
+        <div class="section-num">Section 2</div>
+        <h2>Robot System Architecture</h2>
+        <p>Every QIROX cell consists of four primary system elements. Understanding what each one does — and what connects to what — is essential before touching any part of the system.</p>
+
+        <div class="img-block">
+          <img src="images/m01-robot-system-structure-qs.png" alt="QIROX system structure block diagram" class="training-img">
+          <div class="img-caption">Complete QIROX system block diagram showing robot mechanics, controller, teach pendant, and peripheral connections. Source: PA_Qirox_QS2.12</div>
+        </div>
+
+        <table>
+          <tr><th>Component</th><th>Function</th><th>Physical Location</th></tr>
+          <tr><td><strong>Robot Mechanics (QRC)</strong></td><td>6-axis articulated arm — executes all motion commands. Carries the welding torch at the A6 flange.</td><td>Mounted to floor, column, or gantry inside cell</td></tr>
+          <tr><td><strong>Robot Controller (QC2)</strong></td><td>The brain — processes programs, controls servo drives, manages safety I/O, and communicates with all peripherals.</td><td>Free-standing cabinet, typically outside safety fence</td></tr>
+          <tr><td><strong>Teach Pendant (QPHG 2)</strong></td><td>Operator interface — all programming, jogging, mode selection, and status monitoring happens here.</td><td>Handheld, connected to controller via cable or wireless</td></tr>
+          <tr><td><strong>QINEO Power Source</strong></td><td>Provides the welding arc — controls wire feed, voltage, current, and shielding gas. Communicates with controller via QTI interface.</td><td>Separate cabinet adjacent to cell</td></tr>
+        </table>
+
+        <div class="img-block">
+          <img src="images/m01-robot-system-structure.png" alt="QIROX V7 robot system structure" class="training-img">
+          <div class="img-caption">V7 manual system structure overview showing how robot mechanics, controller, positioner, and power source form a complete welding cell. Source: PA_Qirox_V7</div>
+        </div>
+
+        <p>The controller is the hub. Everything else — teach pendant, robot arm, power source, positioners, safety fence, PLC — connects back to it. If something is not working, the controller's logbook is always the first place to look.</p>
+      </div>
+    </div>
+
+    <!-- Step 3: Six Axes -->
+    <div class="step" data-label="Six Axes">
+      <div class="section">
+        <div class="section-num">Section 3</div>
+        <h2>The Six Robot Axes</h2>
+        <p>The QRC robot has six rotary axes labeled A1 through A6. Each axis has a defined positive and negative direction. Understanding the axis layout is the foundation for jogging, programming, and diagnosing motion faults.</p>
+
+        <div class="img-block">
+          <img src="images/m01-robot-axes.png" alt="QIROX robot axes A1-A6" class="training-img">
+          <div class="img-caption">Axis layout for a QIROX QRC robot. A1 rotates the base. A2/A3 control shoulder and elbow. A4–A6 are the wrist axes. Source: PA_Qirox_V7</div>
+        </div>
+
+        <ul class="steps">
+          <li><div class="step-num">A1</div><span><strong>Base rotation</strong> — Rotates the entire arm around the vertical mounting axis. Largest range of motion (~340°).</span></li>
+          <li><div class="step-num">A2</div><span><strong>Shoulder</strong> — Pivots the upper arm forward and back relative to the base.</span></li>
+          <li><div class="step-num">A3</div><span><strong>Elbow</strong> — Bends the forearm up and down. Combined with A2 defines reach height.</span></li>
+          <li><div class="step-num">A4</div><span><strong>Wrist roll</strong> — Rotates the forearm around its own axis. Provides torch orientation twist.</span></li>
+          <li><div class="step-num">A5</div><span><strong>Wrist bend</strong> — Tilts the wrist up/down. Primary torch angle axis.</span></li>
+          <li><div class="step-num">A6</div><span><strong>Torch rotation</strong> — Final rotation at the flange. Fine-tunes approach angle for tight joint access.</span></li>
+        </ul>
+
+        <div class="callout callout-warning">
+          <div class="callout-label">Warning</div>
+          Each axis has a software-defined working range limit. If a programmed position would exceed a limit, the controller raises a range error before executing the movement. Never attempt to force movement beyond displayed range limits — this indicates a programming or calibration issue, not a hardware problem to override.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Working Range -->
+    <div class="step" data-label="Working Range">
+      <div class="section">
+        <div class="section-num">Section 4</div>
+        <h2>Working Range &amp; Cell Layout Concepts</h2>
+        <p>The working range is the 3D envelope within which the robot's Tool Center Point (TCP) can physically reach. It is bounded by both the mechanical limits of the arm and any software-defined safety zones configured for the cell.</p>
+
+        <div class="img-block">
+          <img src="images/m01-working-range.png" alt="QIROX robot working range diagram" class="training-img">
+          <div class="img-caption">Working range cross-section for a QRC-class robot. Unrestricted range (outer envelope), restricted range (software limits), and maximum area are all defined during commissioning. Source: PA_Qirox_V7</div>
+        </div>
+
+        <table>
+          <tr><th>Range Type</th><th>Definition</th><th>Who Sets It</th></tr>
+          <tr><td><strong>Unrestricted Working Range</strong></td><td>The full mechanical envelope the robot can physically reach without any software restrictions.</td><td>Fixed by hardware design</td></tr>
+          <tr><td><strong>Restricted Working Range</strong></td><td>The portion of the envelope within software axis limits set at commissioning — the normal operating zone.</td><td>Commissioning engineer</td></tr>
+          <tr><td><strong>Maximum Area</strong></td><td>The outer boundary used for safety zone design — all personnel exclusion barriers must exceed this radius.</td><td>Cell designer / safety engineer</td></tr>
+          <tr><td><strong>Restricted Area</strong></td><td>Zones where motion is intentionally prohibited — e.g., near the operator station or fixture clamps.</td><td>Commissioning engineer</td></tr>
+        </table>
+
+        <div class="callout callout-tip">
+          <div class="callout-label">Field Note</div>
+          On customer sites, the programmed axis limits may be tighter than the mechanical limits to protect fixtures, positioners, or nearby equipment. Always check the axis limit values during commissioning before testing movements near boundaries.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Quiz -->
+    <div class="step" data-label="Knowledge Check">
+      <div class="quiz-section">
+        <h2>Knowledge Check</h2>
+        <p>Answer each question to complete this module. You need 4 of 5 correct (80%) to pass.</p>
+
+        <div class="quiz-q-progress">
+          <div class="quiz-q-bar-outer"><div class="quiz-q-bar-inner" id="quiz-bar" style="width:0%"></div></div>
+          <span class="quiz-progress-text" id="quiz-progress-text">Question 1 of 5</span>
+        </div>
+
+        <div id="quiz-container"></div>
+
+        <!-- Result -->
+        <div class="quiz-final" id="quiz-final">
+          <h3 id="quiz-result-title"></h3>
+          <div id="quiz-result-pass" style="display:none;">
+            <p style="color:var(--green);font-size:15px;margin-bottom:12px;">Module 01 complete.</p>
+            <p>Use the module navigation below to continue to Module 02 — Controller Variants.</p>
+          </div>
+          <div id="quiz-result-fail" style="display:none;">
+            <p>Use the <strong>Back</strong> button to review the sections above, then start the quiz again. Refresh the page to reset.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /stepper -->
+
+  <div class="step-nav">
+    <button class="step-prev" onclick="prevStep()" disabled>&#8592; Back</button>
+    <div class="step-nav-center">
+      <div class="step-dots">
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="step-label">Objectives — 1 of 6</div>
+    </div>
+    <button class="step-next" onclick="nextStep()">Next &#8594;</button>
+  </div>
+
+  <div class="nav-buttons">
+    <a href="index.html" class="nav-btn">&#8592; Trail Index</a>
+    <a href="module-02-controller-variants.html" class="nav-btn primary">Next: Controller Variants &#8594;</a>
+  </div>
+
+</div><!-- /main -->
+
+<div class="sidebar">
+  <div class="sidebar-card">
+    <h4>Module Navigation</h4>
+    <ul class="mod-nav-list">
+      <li class="active"><a href="#">01. System Overview</a></li>
+      <li><a href="module-02-controller-variants.html">02. Controller Variants</a></li>
+      <li><a href="module-03-teach-pendant.html">03. Teach Pendant</a></li>
+      <li><a href="module-04-operating-modes.html">04. Operating Modes</a></li>
+      <li><a href="module-05-drives-on.html">05. Drives ON</a></li>
+    </ul>
+  </div>
+  <div class="sidebar-card">
+    <h4>Module Info</h4>
+    <div class="info-row"><span class="info-label">Level</span><span class="info-val">L1 Foundation</span></div>
+    <div class="info-row"><span class="info-label">Time</span><span class="info-val">~15 min</span></div>
+    <div class="info-row"><span class="info-label">Pass Threshold</span><span class="info-val">80% (4/5)</span></div>
+    <div class="info-row"><span class="info-label">Source</span><span class="info-val">PA_Qirox_V7 / QS2.12</span></div>
+  </div>
+  <div class="sidebar-card">
+    <h4>Sections</h4>
+    <ul class="mod-nav-list">
+      <li><a href="#" onclick="goToStep(0);return false;">Objectives</a></li>
+      <li><a href="#" onclick="goToStep(1);return false;">01. Robot Family</a></li>
+      <li><a href="#" onclick="goToStep(2);return false;">02. System Architecture</a></li>
+      <li><a href="#" onclick="goToStep(3);return false;">03. Six Axes</a></li>
+      <li><a href="#" onclick="goToStep(4);return false;">04. Working Range</a></li>
+      <li><a href="#" onclick="jumpToQuiz();return false;">Knowledge Check</a></li>
+    </ul>
+  </div>
+  <div class="sidebar-card">
+    <h4>Who Needs This</h4>
+    <span class="role-chip">CommL1</span>
+    <span class="role-chip">FSTL1</span>
+    <span class="role-chip">AppEngL1</span>
+    <span class="role-chip">OnProgL1</span>
+    <span class="role-chip">OffProgL1</span>
+  </div>
+  <div class="sidebar-card">
+    <h4>Key Terms</h4>
+    <ul class="mod-nav-list">
+      <li><a href="#">QRC — Robot arm (mechanics)</a></li>
+      <li><a href="#">QC2 — Controller cabinet</a></li>
+      <li><a href="#">QPHG 2 — Teach pendant</a></li>
+      <li><a href="#">A1–A6 — Robot axes</a></li>
+      <li><a href="#">TCP — Tool Center Point</a></li>
+      <li><a href="#">Working Range — Reachable envelope</a></li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /layout -->
+
+<script src="step.js"></script>
+<script src="quiz.js"></script>
+<script src="lightbox.js"></script>
+<script>
+const STORAGE_KEY = 'qirox-foundation-completed';
+const MODULE_NUM = 1;
+var QUIZ_BANK = [
+  {
+    type: 'mcq',
+    text: 'Which QIROX QRC model has the greatest reach radius?',
+    options: ['QRC 320', 'QRC 350', 'QRC 410', 'QRC 450'],
+    correct: 2,
+    explanation: 'The QRC 410 reaches approximately 2,500 mm — the largest standard model.'
+  },
+  {
+    type: 'text',
+    text: 'The welding torch is mounted at the ___ flange of the QIROX robot arm.',
+    hint: 'Type the axis designation.',
+    placeholder: 'e.g. A6',
+    accepted: ['a6', 'axis 6', 'wrist'],
+    explanation: 'The torch mounts to the A6 wrist flange — the final output axis.'
+  },
+  {
+    type: 'mcq',
+    text: 'Which component is the "brain" of a QIROX cell, running programs and controlling all servo drives?',
+    options: ['QINEO power source', 'Robot controller (QC2)', 'Teach pendant (QPHG 2)', 'Robot mechanics (QRC)'],
+    correct: 1,
+    explanation: 'The QC2 controller processes all programs and drives all axes.'
+  },
+  {
+    type: 'text',
+    text: 'The restricted working range is limited by software ___ configured at commissioning.',
+    hint: 'Type one or two words.',
+    placeholder: 'e.g. limits',
+    accepted: ['limit', 'limits', 'axis limit', 'software limit'],
+    explanation: 'Software axis limits are set during commissioning to define the safe operating zone.'
+  },
+  {
+    type: 'mcq',
+    text: 'An axis range error stops the robot mid-program. This most likely indicates:',
+    options: [
+      'A hardware failure in the servo drive',
+      'A programming or calibration issue — the position exceeds the axis software limit',
+      'A broken cable in the robot arm',
+      'An issue with the QINEO power source connection'
+    ],
+    correct: 1,
+    explanation: 'Range errors are programming/calibration issues — never force past a range limit.'
+  },
+  {
+    type: 'mcq',
+    text: 'How many rotary axes does a QRC robot have?',
+    options: ['4', '5', '6', '7'],
+    correct: 2,
+    explanation: 'All QRC robots are 6-axis articulated arms — axes A1 through A6.'
+  },
+  {
+    type: 'mcq',
+    text: 'What is the primary function of axis A1 on a QIROX robot?',
+    options: [
+      'Torch rotation at the wrist (A6 flange)',
+      'Elbow bend — forearm up and down',
+      'Base rotation around the vertical mounting axis',
+      'Shoulder pivot forward and backward'
+    ],
+    correct: 2,
+    explanation: 'A1 rotates the entire arm around the base mounting point — the largest range motion axis.'
+  },
+  {
+    type: 'text',
+    text: 'What three-letter abbreviation describes the defined tip of the welding tool on a QIROX robot?',
+    hint: 'Think: Tool ___ Point',
+    placeholder: 'e.g. TCP',
+    accepted: ['tcp', 'tool center point'],
+    explanation: 'TCP (Tool Center Point) — the reference point at the torch wire tip used for all Cartesian positioning.'
+  }
+];
+document.addEventListener('DOMContentLoaded', function() {
+  initQuiz(QUIZ_BANK, 5, STORAGE_KEY, MODULE_NUM);
+});
+</script>
+</body>
+</html>

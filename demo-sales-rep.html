@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Rep AI — Territory Intelligence Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #03080f;
+      --surface:    #081525;
+      --surface-2:  #0d1f38;
+      --surface-3:  #112547;
+      --border:     #162d4d;
+      --border-2:   #1e3d66;
+      --accent:     #1d6fe8;
+      --accent-s:   #4d94ff;
+      --glow:       rgba(29,111,232,0.16);
+      --cyan:       #06c8e8;
+      --green:      #12c98a;
+      --amber:      #f5a623;
+      --red:        #ef5f5f;
+      --text:       #d8e8f8;
+      --text-2:     #7a9cc0;
+      --text-3:     #3f5e7a;
+      --r:          12px;
+      --r-sm:       7px;
+      --ease:       cubic-bezier(0.22, 1, 0.36, 1);
+      --t:          0.26s;
+    }
+
+    body {
+      font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(29,111,232,0.1) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      position: relative;
+      z-index: 10;
+      background: rgba(3,8,15,0.9);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-left h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.01em;
+    }
+
+    .header-left .subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-2);
+      margin-top: 0.2rem;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .run-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(18,201,138,0.08);
+      border: 1px solid rgba(18,201,138,0.25);
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--green);
+    }
+
+    .run-dot {
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+
+    .back-link {
+      color: var(--accent-s);
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-family: 'Space Mono', monospace;
+      transition: color var(--t);
+    }
+
+    .back-link:hover { color: var(--cyan); }
+
+    /* ── PAGE ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ── SUMMARY STRIP ── */
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem 1.5rem;
+      transition: border-color var(--t) var(--ease), transform var(--t);
+    }
+
+    .stat-card:hover {
+      border-color: rgba(29,111,232,0.35);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-val {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.8rem;
+      line-height: 1;
+      color: var(--accent-s);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-sub {
+      font-size: 0.78rem;
+      color: var(--text-2);
+    }
+
+    /* ── TERRITORY MAP (text-based) ── */
+    .territory-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .territory-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      flex-shrink: 0;
+    }
+
+    .state-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+    .state-chip {
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+    }
+
+    .state-primary {
+      background: rgba(29,111,232,0.15);
+      border: 1px solid rgba(29,111,232,0.3);
+      color: var(--accent-s);
+    }
+
+    .state-extended {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-3);
+    }
+
+    /* ── SECTION HEADING ── */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .section-head h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .section-head .tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--text-3);
+    }
+
+    /* ── PROSPECT CARDS ── */
+    .prospects { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2.5rem; }
+
+    .prospect-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: border-color var(--t) var(--ease), box-shadow var(--t);
+    }
+
+    .prospect-card:hover {
+      border-color: rgba(29,111,232,0.3);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+    }
+
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .company-info { display: flex; align-items: flex-start; gap: 1rem; }
+
+    .company-initial {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .company-details h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .company-meta {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .company-meta span {
+      display: flex;
+      align-items: center;
+    }
+
+    .company-meta span + span::before {
+      content: '·';
+      color: var(--text-3);
+      padding: 0 0.55rem;
+    }
+
+    /* Score badge */
+    .score-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+
+    .score-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .score-lbl {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-3);
+      margin-top: 0.2rem;
+    }
+
+    .score-bar {
+      width: 80px;
+      height: 4px;
+      background: var(--surface-3);
+      border-radius: 2px;
+      margin-top: 0.4rem;
+      overflow: hidden;
+    }
+
+    .score-fill { height: 100%; border-radius: 2px; }
+
+    .score-high  .score-num  { color: var(--green); }
+    .score-high  .score-fill { background: var(--green); }
+    .score-med   .score-num  { color: var(--amber); }
+    .score-med   .score-fill { background: var(--amber); }
+    .score-low   .score-num  { color: var(--text-2); }
+    .score-low   .score-fill { background: var(--text-2); }
+
+    /* Card body */
+    .card-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+    }
+
+    .card-col {
+      padding: 1.25rem 1.5rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .card-col:last-child { border-right: none; }
+
+    .col-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-bottom: 0.65rem;
+    }
+
+    /* Signals */
+    .signal-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    .signal {
+      font-size: 0.83rem;
+      color: var(--text-2);
+      line-height: 1.62;
+      padding-left: 0.85rem;
+      position: relative;
+    }
+
+    .signal::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.58em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(29, 111, 232, 0.5);
+    }
+
+    /* Contact */
+    .contact-block { display: flex; flex-direction: column; gap: 0.3rem; }
+
+    .contact-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .contact-title {
+      font-size: 0.8rem;
+      color: var(--text-2);
+    }
+
+    .contact-email {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent-s);
+      word-break: break-all;
+    }
+
+    .contact-source {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Outreach draft */
+    .draft-preview {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 0.75rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--text-2);
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .draft-subject {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Card footer */
+    .card-footer {
+      padding: 0.85rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .badge-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    .mini-badge {
+      padding: 0.18rem 0.6rem;
+      border-radius: 100px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+    }
+
+    .mb-blue { background: rgba(29,111,232,0.1); border: 1px solid rgba(29,111,232,0.25); color: var(--accent-s); }
+    .mb-green { background: rgba(18,201,138,0.1); border: 1px solid rgba(18,201,138,0.2); color: var(--green); }
+    .mb-amber { background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.2); color: var(--amber); }
+
+    .btn-add {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: var(--r-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--t) var(--ease);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-add:hover {
+      background: var(--accent-s);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px var(--glow);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--surface-3);
+      border: 1px solid rgba(18,201,138,0.4);
+      border-radius: var(--r-sm);
+      padding: 0.75rem 1.25rem;
+      font-size: 0.85rem;
+      color: var(--green);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+      animation: toastIn 0.25s var(--ease);
+    }
+
+    #toast.show { display: flex; }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── FOOTER NOTE ── */
+    .report-footer {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-3);
+    }
+
+    .report-footer a {
+      color: var(--accent-s);
+      text-decoration: none;
+    }
+
+    @media (max-width: 760px) {
+      .card-body { grid-template-columns: 1fr; }
+      .card-col { border-right: none; border-bottom: 1px solid var(--border); }
+      .card-col:last-child { border-bottom: none; }
+      .page { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>Sales Rep AI — Territory Intelligence</h1>
+    <div class="subtitle">Generated: Monday, May 12, 2026 · 6:04 AM · Automated run</div>
+  </div>
+  <div class="header-right">
+    <div class="run-badge"><div class="run-dot"></div>Auto-generated weekly</div>
+    <a href="portfolio.html" class="back-link">← Portfolio</a>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- SUMMARY STRIP -->
+  <div class="summary-strip">
+    <div class="stat-card">
+      <div class="stat-label">Prospects Scanned</div>
+      <div class="stat-val">47</div>
+      <div class="stat-sub">This week's run</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">ICP Qualified</div>
+      <div class="stat-val">3</div>
+      <div class="stat-sub">Score ≥ 6.5 / 10</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Contacts Found</div>
+      <div class="stat-val">3</div>
+      <div class="stat-sub">Via Hunter.io</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">HubSpot Queued</div>
+      <div class="stat-val">3</div>
+      <div class="stat-sub">Pending your review</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Run Time</div>
+      <div class="stat-val">4.2m</div>
+      <div class="stat-sub">Fully automated</div>
+    </div>
+  </div>
+
+  <!-- TERRITORY -->
+  <div class="territory-bar">
+    <div class="territory-label">Territory</div>
+    <div>
+      <div class="state-chips">
+        <span class="state-chip state-primary">CA</span>
+        <span class="state-chip state-primary">CO</span>
+        <span class="state-chip state-primary">UT</span>
+        <span class="state-chip state-primary">NM</span>
+        <span class="state-chip state-extended">WI</span>
+        <span class="state-chip state-extended">IL</span>
+        <span class="state-chip state-extended">IN</span>
+        <span class="state-chip state-extended">IA</span>
+        <span class="state-chip state-extended">OH</span>
+        <span class="state-chip state-extended">MN</span>
+        <span class="state-chip state-extended">MI</span>
+        <span class="state-chip state-extended">TX</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROSPECTS SECTION -->
+  <div class="section-head">
+    <h2>Qualified Prospects — Ready for Outreach</h2>
+    <div class="tag">Sorted by ICP score · Contacts verified via Hunter.io</div>
+  </div>
+
+  <div class="prospects">
+
+    <!-- ── PROSPECT 1 ── -->
+    <div class="prospect-card">
+      <div class="card-header">
+        <div class="company-info">
+          <div class="company-initial">MW</div>
+          <div class="company-details">
+            <h3>Midwest Precision Fabricators</h3>
+            <div class="company-meta">
+              <span>Milwaukee, WI</span>
+              <span>Heavy Fabrication / Structural Steel</span>
+              <span>Est. $45M annual revenue</span>
+              <span>180 employees</span>
+            </div>
+          </div>
+        </div>
+        <div class="score-badge score-high">
+          <div class="score-num">8.7</div>
+          <div class="score-lbl">ICP Score</div>
+          <div class="score-bar"><div class="score-fill" style="width:87%"></div></div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="card-col">
+          <div class="col-label">Buying Signals</div>
+          <div class="signal-list">
+            <div class="signal">Posted 4 welding positions in last 30 days — strong indicator of capacity constraint</div>
+            <div class="signal">Press release: $8M plant expansion, Q3 2026 completion</div>
+            <div class="signal">Landed 3-year contract with Caterpillar Tier-1 supplier</div>
+            <div class="signal">Current manual welding process — no automation on LinkedIn / company site</div>
+          </div>
+        </div>
+        <div class="card-col">
+          <div class="col-label">Contact Found</div>
+          <div class="contact-block">
+            <div class="contact-name">Brian Kowalski</div>
+            <div class="contact-title">VP of Manufacturing Operations</div>
+            <div class="contact-email">b.kowalski@mwprecision.com</div>
+            <div class="contact-source">Hunter.io · 94% confidence</div>
+            <div style="margin-top:.6rem; font-size:.78rem; color:var(--text-2);">Also found: Jake Hendricks, Plant Manager (backup contact)</div>
+          </div>
+        </div>
+        <div class="card-col">
+          <div class="col-label">Draft Outreach</div>
+          <div class="draft-preview">
+            <div class="draft-subject">Subject: Robotic welding for your Caterpillar contract ramp</div>
+            "Brian — Saw the announcement on Midwest Precision's Caterpillar contract. Congrats. With 4 open welding positions and a plant expansion underway, I wanted to reach out about how other heavy fabricators are handling volume spikes with robotic welding…"
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="badge-row">
+          <span class="mini-badge mb-green">High Priority</span>
+          <span class="mini-badge mb-blue">Expansion Signal</span>
+          <span class="mini-badge mb-blue">Hiring Signal</span>
+          <span class="mini-badge mb-amber">No Automation</span>
+        </div>
+        <button class="btn-add" onclick="addToHubspot(this, 'Midwest Precision Fabricators')">+ Add to HubSpot</button>
+      </div>
+    </div>
+
+    <!-- ── PROSPECT 2 ── -->
+    <div class="prospect-card">
+      <div class="card-header">
+        <div class="company-info">
+          <div class="company-initial" style="background:linear-gradient(135deg,#0f52a3,#06c8e8);">RC</div>
+          <div class="company-details">
+            <h3>Rocky Mountain Contract Mfg.</h3>
+            <div class="company-meta">
+              <span>Denver, CO</span>
+              <span>Contract Manufacturing / Ag Equipment</span>
+              <span>Est. $22M annual revenue</span>
+              <span>95 employees</span>
+            </div>
+          </div>
+        </div>
+        <div class="score-badge score-med">
+          <div class="score-num">7.1</div>
+          <div class="score-lbl">ICP Score</div>
+          <div class="score-bar"><div class="score-fill" style="width:71%"></div></div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="card-col">
+          <div class="col-label">Buying Signals</div>
+          <div class="signal-list">
+            <div class="signal">LinkedIn job post: "Experienced Robotic Welder" — existing automation, looking to expand</div>
+            <div class="signal">New John Deere and CNH parts contract signed March 2026</div>
+            <div class="signal">Owner posted about labor cost challenges on LinkedIn last week</div>
+          </div>
+        </div>
+        <div class="card-col">
+          <div class="col-label">Contact Found</div>
+          <div class="contact-block">
+            <div class="contact-name">Sandra Flores</div>
+            <div class="contact-title">President &amp; Owner</div>
+            <div class="contact-email">sflores@rockymtncontract.com</div>
+            <div class="contact-source">Hunter.io · 88% confidence</div>
+            <div style="margin-top:.6rem; font-size:.78rem; color:var(--text-2);">Direct owner contact — decision-maker</div>
+          </div>
+        </div>
+        <div class="card-col">
+          <div class="col-label">Draft Outreach</div>
+          <div class="draft-preview">
+            <div class="draft-subject">Subject: Re: your post on welding labor costs</div>
+            "Sandra — Your LinkedIn post about labor costs this week resonated. We work with contract manufacturers in CO and UT who hit the same ceiling — they couldn't scale without automation, and adding headcount wasn't the answer. Would love to share what's working for similar shops…"
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="badge-row">
+          <span class="mini-badge mb-amber">Medium Priority</span>
+          <span class="mini-badge mb-blue">Has Some Automation</span>
+          <span class="mini-badge mb-blue">New Contracts</span>
+          <span class="mini-badge mb-green">Owner Accessible</span>
+        </div>
+        <button class="btn-add" onclick="addToHubspot(this, 'Rocky Mountain Contract Mfg.')">+ Add to HubSpot</button>
+      </div>
+    </div>
+
+    <!-- ── PROSPECT 3 ── -->
+    <div class="prospect-card">
+      <div class="card-header">
+        <div class="company-info">
+          <div class="company-initial" style="background:linear-gradient(135deg,#1a5276,#3498db);">PC</div>
+          <div class="company-details">
+            <h3>Pacific Coast Structural</h3>
+            <div class="company-meta">
+              <span>Fresno, CA</span>
+              <span>Structural Steel / Infrastructure</span>
+              <span>Est. $31M annual revenue</span>
+              <span>140 employees</span>
+            </div>
+          </div>
+        </div>
+        <div class="score-badge score-med">
+          <div class="score-num">6.8</div>
+          <div class="score-lbl">ICP Score</div>
+          <div class="score-bar"><div class="score-fill" style="width:68%"></div></div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="card-col">
+          <div class="col-label">Buying Signals</div>
+          <div class="signal-list">
+            <div class="signal">Won $14M CA infrastructure contract — federal Bipartisan Infrastructure Law funding</div>
+            <div class="signal">3 open welder positions, posted 6 weeks ago — unfilled, labor-constrained</div>
+            <div class="signal">No automation footprint found — all manual processes based on LinkedIn and website</div>
+          </div>
+        </div>
+        <div class="card-col">
+          <div class="col-label">Contact Found</div>
+          <div class="contact-block">
+            <div class="contact-name">Mark Trevino</div>
+            <div class="contact-title">Director of Operations</div>
+            <div class="contact-email">m.trevino@paccoaststructural.com</div>
+            <div class="contact-source">Hunter.io · 82% confidence</div>
+            <div style="margin-top:.6rem; font-size:.78rem; color:var(--text-2);">Note: CEO David Yuen also on LinkedIn — potential warm intro path</div>
+          </div>
+        </div>
+        <div class="card-col">
+          <div class="col-label">Draft Outreach</div>
+          <div class="draft-preview">
+            <div class="draft-subject">Subject: Welding capacity for your CA infrastructure contract</div>
+            "Mark — Congrats on the infrastructure win — that's a significant ramp. I work with structural fabricators in CA who are in exactly the same position: major contract, hiring pipeline not fast enough. Automated welding is closing that gap for a few of them right now…"
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="badge-row">
+          <span class="mini-badge mb-amber">Medium Priority</span>
+          <span class="mini-badge mb-blue">Government Contract</span>
+          <span class="mini-badge mb-amber">Unfilled Hiring</span>
+          <span class="mini-badge mb-amber">No Automation Yet</span>
+        </div>
+        <button class="btn-add" onclick="addToHubspot(this, 'Pacific Coast Structural')">+ Add to HubSpot</button>
+      </div>
+    </div>
+
+  </div><!-- /prospects -->
+
+  <!-- SYSTEM INFO -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:2rem;">
+    <div style="font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:.75rem;">How This Report Was Generated</div>
+    <div style="display:flex;gap:0;flex-wrap:wrap;">
+      <div style="flex:1;min-width:160px;padding:.6rem 1rem;border-right:1px solid var(--border);">
+        <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.25rem;">Step 1</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.15rem;">Prospect Scan</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Pulled 47 target companies from territory database against ICP criteria</div>
+      </div>
+      <div style="flex:1;min-width:160px;padding:.6rem 1rem;border-right:1px solid var(--border);">
+        <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.25rem;">Step 2</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.15rem;">Signal Research</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Perplexity API searched each company for buying signals, news, job posts</div>
+      </div>
+      <div style="flex:1;min-width:160px;padding:.6rem 1rem;border-right:1px solid var(--border);">
+        <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.25rem;">Step 3</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.15rem;">ICP Scoring</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Claude API scored each prospect against 8 ICP dimensions, returned top 3</div>
+      </div>
+      <div style="flex:1;min-width:160px;padding:.6rem 1rem;border-right:1px solid var(--border);">
+        <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.25rem;">Step 4</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.15rem;">Contact Lookup</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Hunter.io API found verified decision-maker contacts for each qualified company</div>
+      </div>
+      <div style="flex:1;min-width:160px;padding:.6rem 1rem;">
+        <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.25rem;">Step 5</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.15rem;">Draft Outreach</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Claude wrote personalized first-touch email drafts using signals found in Step 2</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- FOOTER -->
+<div class="report-footer">
+  <span>Sales Rep AI · Automated Territory Intelligence · Run: 2026-05-12 06:04 UTC</span>
+  <span>HubSpot integration active · Hunter.io · Perplexity · Claude API</span>
+  <a href="portfolio.html">← Back to Portfolio</a>
+</div>
+
+<!-- TOAST -->
+<div id="toast">✓ <span id="toast-msg"></span></div>
+
+<script>
+  function addToHubspot(btn, company) {
+    btn.textContent = '✓ Added';
+    btn.style.background = 'var(--green)';
+    btn.disabled = true;
+
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = company + ' added to HubSpot pipeline';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>

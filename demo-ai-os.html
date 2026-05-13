@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal AI OS — Montbriand AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #03080f;
+      --surface:    #081525;
+      --surface-2:  #0d1f38;
+      --surface-3:  #112547;
+      --border:     #162d4d;
+      --border-2:   #1e3d66;
+      --accent:     #1d6fe8;
+      --accent-s:   #4d94ff;
+      --glow:       rgba(29,111,232,0.18);
+      --cyan:       #06c8e8;
+      --green:      #12c98a;
+      --amber:      #f5a623;
+      --text:       #d8e8f8;
+      --text-2:     #7a9cc0;
+      --text-3:     #3f5e7a;
+      --r:          12px;
+      --r-sm:       8px;
+      --ease:       cubic-bezier(0.22, 1, 0.36, 1);
+      --t:          0.28s;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(29,111,232,0.1) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(3,8,15,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-logo {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .topbar-logo em { color: var(--accent-s); font-style: normal; }
+
+    .back-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-3);
+      text-decoration: none;
+      transition: color var(--t);
+    }
+
+    .back-link:hover { color: var(--accent-s); }
+
+    /* ── SHARED ── */
+    .section { position: relative; z-index: 1; }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .section-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-s);
+      margin-bottom: 1.1rem;
+    }
+
+    /* ── REVEAL ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+
+    .reveal.vis {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 7rem 0 5rem;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(29,111,232,0.08);
+      border: 1px solid rgba(29,111,232,0.2);
+      border-radius: 100px;
+      padding: 0.35rem 1rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--accent-s);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-s);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 1.04;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 1.75rem;
+      max-width: 820px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent-s);
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-2);
+      line-height: 1.7;
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.85rem 2.2rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all var(--t) var(--ease);
+      box-shadow: 0 4px 20px rgba(29,111,232,0.3);
+    }
+
+    .hero-cta:hover {
+      background: var(--accent-s);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(29,111,232,0.4);
+    }
+
+    /* ── ARCHITECTURE DIAGRAM ── */
+    .arch-section {
+      padding: 5rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      align-items: center;
+      margin-top: 3.5rem;
+    }
+
+    .arch-side {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .arch-side.right { align-items: flex-start; }
+    .arch-side.left  { align-items: flex-end; }
+
+    .arch-node {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 0.65rem 1.1rem;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      white-space: nowrap;
+      transition: border-color var(--t), color var(--t);
+    }
+
+    .arch-node:hover {
+      border-color: var(--border-2);
+      color: var(--text);
+    }
+
+    .arch-node-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-blue  { background: var(--accent-s); }
+    .dot-cyan  { background: var(--cyan); }
+    .dot-green { background: var(--green); }
+    .dot-amber { background: var(--amber); }
+
+    .arch-center {
+      width: 180px;
+      text-align: center;
+      padding: 0 2rem;
+    }
+
+    .ai-core {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, rgba(29,111,232,0.2), rgba(6,200,232,0.06) 70%, transparent);
+      border: 1.5px solid rgba(29,111,232,0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: 0 0 40px rgba(29,111,232,0.12), inset 0 0 30px rgba(29,111,232,0.06);
+    }
+
+    .ai-core::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(29,111,232,0.12);
+      animation: orbit 6s linear infinite;
+    }
+
+    @keyframes orbit {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .ai-core-label {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: var(--accent-s);
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    .ai-core-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--text-3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+    }
+
+    .arch-arrow-left, .arch-arrow-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0.5rem 0;
+      opacity: 0.3;
+    }
+
+    .arch-arrow-left { justify-content: flex-end; }
+    .arch-arrow-right { justify-content: flex-start; }
+
+    .arrow-line {
+      width: 28px;
+      height: 1px;
+      background: var(--border-2);
+    }
+
+    .arrow-tip { font-size: 0.65rem; color: var(--text-3); }
+
+    /* ── OUTPUTS SECTION ── */
+    .outputs-section {
+      padding: 5rem 0 4rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .outputs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .output-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: border-color var(--t) var(--ease), transform var(--t);
+    }
+
+    .output-card:hover {
+      border-color: var(--border-2);
+      transform: translateY(-3px);
+    }
+
+    .output-card-header {
+      padding: 1.1rem 1.4rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .output-type {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 0.3rem;
+    }
+
+    .output-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .output-time {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--accent-s);
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .output-body {
+      padding: 1.1rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    /* Morning Brief card */
+    .brief-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: var(--text-2);
+    }
+
+    .brief-row-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent-s);
+      flex-shrink: 0;
+      margin-top: 0.45em;
+    }
+
+    .brief-row strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .brief-divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    .brief-flag {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--amber);
+      line-height: 1.5;
+    }
+
+    .flag-bar {
+      width: 3px;
+      height: 100%;
+      min-height: 2.5em;
+      background: rgba(245,166,35,0.3);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .flag-text { color: var(--text-2); }
+    .flag-text strong { color: var(--amber); }
+
+    /* Lead Signal card */
+    .signal-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 0.9rem 1rem;
+    }
+
+    .signal-company {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .signal-type {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      margin-bottom: 0.6rem;
+    }
+
+    .signal-chips {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.65rem;
+    }
+
+    .sig-chip {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .chip-green {
+      background: rgba(18,201,138,0.1);
+      border: 1px solid rgba(18,201,138,0.2);
+      color: var(--green);
+    }
+
+    .signal-ai-note {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      border-left: 2px solid rgba(29,111,232,0.3);
+      padding-left: 0.65rem;
+      line-height: 1.55;
+    }
+
+    .signal-action {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent-s);
+    }
+
+    /* Meeting Prep card */
+    .prep-contact {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .prep-avatar {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1a3a6e, #1d6fe8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .prep-name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .prep-role {
+      font-size: 0.78rem;
+      color: var(--text-2);
+    }
+
+    .prep-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .prep-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      align-items: baseline;
+    }
+
+    .prep-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-3);
+    }
+
+    .prep-val { color: var(--text-2); line-height: 1.5; }
+    .prep-val strong { color: var(--text); font-weight: 600; }
+
+    .prep-lead {
+      background: rgba(29,111,232,0.07);
+      border: 1px solid rgba(29,111,232,0.18);
+      border-radius: var(--r-sm);
+      padding: 0.65rem 0.85rem;
+      font-size: 0.8rem;
+      color: var(--text-2);
+      line-height: 1.55;
+    }
+
+    .prep-lead-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-s);
+      margin-bottom: 0.3rem;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      padding: 5rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      margin-top: 3.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .step {
+      padding: 2.25rem 2rem;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+
+    .step:last-child { border-right: none; }
+
+    .step-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .step-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-bottom: 0.65rem;
+    }
+
+    .step-body {
+      font-size: 0.88rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    .step-accent {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity var(--t);
+    }
+
+    .step:hover .step-accent { opacity: 1; }
+
+    /* ── INTEGRATIONS STRIP ── */
+    .integrations-strip {
+      padding: 3.5rem 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .int-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-3);
+      margin-bottom: 1.5rem;
+    }
+
+    .int-nodes {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .int-node {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-2);
+      transition: all var(--t) var(--ease);
+    }
+
+    .int-node:hover {
+      border-color: var(--border-2);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 6rem 0 5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .cta-section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+    }
+
+    .cta-section h2 em {
+      font-style: normal;
+      color: var(--accent-s);
+    }
+
+    .cta-section p {
+      font-size: 1.05rem;
+      color: var(--text-2);
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .cta-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 0.85rem 2.2rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all var(--t) var(--ease);
+      box-shadow: 0 4px 20px rgba(29,111,232,0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-s);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(29,111,232,0.4);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border-2);
+      color: var(--text-2);
+      padding: 0.85rem 2.2rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--t) var(--ease);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent-s);
+      color: var(--accent-s);
+    }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-3);
+    }
+
+    .page-footer a { color: var(--accent-s); text-decoration: none; }
+
+    @media (max-width: 820px) {
+      .arch-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .arch-side.left { align-items: flex-start; }
+      .outputs-grid { grid-template-columns: 1fr; }
+      .steps-row { grid-template-columns: 1fr; }
+      .step { border-right: none; border-bottom: 1px solid var(--border); }
+      .step:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<div class="topbar">
+  <a href="portfolio.html" class="topbar-logo">Montbriand <em>AI</em></a>
+  <a href="portfolio.html" class="back-link">← Back to Portfolio</a>
+</div>
+
+<!-- ── HERO ── -->
+<section class="section hero">
+  <div class="container">
+    <div class="hero-eyebrow reveal">AI Operating System · Custom Build</div>
+    <h1 class="reveal">What if your AI<br>knew your <em>entire</em> business?</h1>
+    <p class="hero-sub reveal">I build personalized AI frameworks that connect to your CRM, email, and data — then surface what matters, when it matters. No generic tools. Built for how you work.</p>
+    <a href="mailto:cameronmontbriand@gmail.com" class="hero-cta reveal">Let's build yours →</a>
+  </div>
+</section>
+
+<!-- ── ARCHITECTURE DIAGRAM ── -->
+<section class="section arch-section">
+  <div class="container">
+    <div class="section-tag reveal">// how it connects</div>
+    <h2 class="reveal" style="font-family:'Outfit',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-0.02em;line-height:1.15;margin-bottom:0.5rem;">Everything in one place.<br><span style="color:var(--text-2);font-weight:600;font-size:0.85em;">Your tools talk to each other for the first time.</span></h2>
+
+    <div class="arch-grid reveal">
+      <!-- Left: inputs -->
+      <div class="arch-side left">
+        <div class="arch-node">
+          <div class="arch-node-dot dot-blue"></div>
+          HubSpot CRM
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-dot dot-cyan"></div>
+          Gmail / Inbox
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-dot dot-green"></div>
+          LinkedIn Signals
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-dot dot-amber"></div>
+          Perplexity Web Intel
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-dot dot-blue"></div>
+          Notion / Docs
+        </div>
+      </div>
+
+      <!-- Center: AI core -->
+      <div class="arch-center">
+        <div class="arch-arrow-left">
+          <div class="arrow-line"></div>
+          <div class="arrow-tip">→</div>
+        </div>
+        <div class="ai-core">
+          <div class="ai-core-label">Personal<br>AI OS</div>
+          <div class="ai-core-sub">Claude · N8N · Python</div>
+        </div>
+        <div class="arch-arrow-right">
+          <div class="arrow-tip">→</div>
+          <div class="arrow-line"></div>
+        </div>
+      </div>
+
+      <!-- Right: outputs -->
+      <div class="arch-side right">
+        <div class="arch-node">
+          <div class="arch-node-dot dot-blue"></div>
+          Morning Intel Brief
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-dot dot-green"></div>
+          Lead Signal Alerts
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-dot dot-cyan"></div>
+          Pre-Meeting Context
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-dot dot-amber"></div>
+          Pipeline Summaries
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-dot dot-blue"></div>
+          Auto-drafted Replies
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SAMPLE OUTPUTS ── -->
+<section class="section outputs-section">
+  <div class="container">
+    <div class="section-tag reveal">// sample outputs</div>
+    <h2 class="reveal" style="font-family:'Outfit',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-0.02em;line-height:1.15;margin-bottom:0.5rem;">This is what you'd<br><span style="color:var(--text-2);font-weight:600;font-size:0.85em;">wake up to every morning.</span></h2>
+
+    <div class="outputs-grid">
+
+      <!-- Output 1: Morning Brief -->
+      <div class="output-card reveal">
+        <div class="output-card-header">
+          <div>
+            <div class="output-type">Daily Brief</div>
+            <div class="output-title">Morning Intelligence</div>
+          </div>
+          <div class="output-time">6:02 AM · Auto-run</div>
+        </div>
+        <div class="output-body">
+          <div class="brief-row">
+            <div class="brief-row-dot"></div>
+            <div><strong>Apex Manufacturing</strong> — quote opened 4× since Tuesday. Follow up today.</div>
+          </div>
+          <div class="brief-row">
+            <div class="brief-row-dot" style="background:var(--amber)"></div>
+            <div><strong>Rocky Mountain CMfg</strong> — 14 days no touch. Approaching drop risk.</div>
+          </div>
+          <div class="brief-row">
+            <div class="brief-row-dot" style="background:var(--green)"></div>
+            <div><strong>Site visit confirmed</strong> — Pacific Coast Structural, Thursday 10 AM.</div>
+          </div>
+          <div class="brief-divider"></div>
+          <div class="brief-flag">
+            <div class="flag-bar"></div>
+            <div class="flag-text"><strong>New signal</strong> — Midwest Steel posted 4 welding positions. Strong capacity constraint indicator. Draft outreach ready.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output 2: Lead Signal -->
+      <div class="output-card reveal">
+        <div class="output-card-header">
+          <div>
+            <div class="output-type">Lead Alert</div>
+            <div class="output-title">Buying Signal Detected</div>
+          </div>
+          <div class="output-time">Overnight scan</div>
+        </div>
+        <div class="output-body">
+          <div class="signal-card">
+            <div class="signal-company">Atlas Fabrication Group</div>
+            <div class="signal-type">Denver, CO · Heavy Manufacturing · Est. $38M</div>
+            <div class="signal-chips">
+              <span class="sig-chip chip-green">ICP Match</span>
+              <span class="sig-chip chip-green">In Territory</span>
+              <span class="sig-chip chip-green">Hiring Signal</span>
+            </div>
+            <div class="signal-ai-note">3 open weld positions posted this week. New John Deere parts contract announced March 2026. Labor-constrained and scaling — high probability they need automation capacity now.</div>
+            <div class="signal-action">
+              Draft outreach ready →
+            </div>
+          </div>
+          <div style="font-size:0.75rem;color:var(--text-3);font-family:'Space Mono',monospace;">Contact verified via Hunter.io · 91% confidence</div>
+        </div>
+      </div>
+
+      <!-- Output 3: Pre-Meeting Brief -->
+      <div class="output-card reveal">
+        <div class="output-card-header">
+          <div>
+            <div class="output-type">Meeting Prep</div>
+            <div class="output-title">30-Second Context</div>
+          </div>
+          <div class="output-time">10 min before call</div>
+        </div>
+        <div class="output-body">
+          <div class="prep-contact">
+            <div class="prep-avatar">MT</div>
+            <div>
+              <div class="prep-name">Mark Trevino</div>
+              <div class="prep-role">Director of Operations · Pacific Coast Structural</div>
+            </div>
+          </div>
+          <div class="prep-rows">
+            <div class="prep-row">
+              <span class="prep-label">Last touch</span>
+              <span class="prep-val">Quote follow-up, 6 days ago</span>
+            </div>
+            <div class="prep-row">
+              <span class="prep-label">Their situation</span>
+              <span class="prep-val"><strong>$14M infrastructure contract</strong> — 3 open welder positions, unfilled 6+ weeks</span>
+            </div>
+            <div class="prep-row">
+              <span class="prep-label">Risk</span>
+              <span class="prep-val" style="color:var(--amber)">2 competitor visits this month</span>
+            </div>
+          </div>
+          <div class="prep-lead">
+            <div class="prep-lead-label">Lead with</div>
+            Capacity gap timeline — how fast can automation close their labor shortfall before the contract ramp hits in Q3?
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT GETS BUILT ── -->
+<section class="section how-section">
+  <div class="container">
+    <div class="section-tag reveal">// the build process</div>
+    <h2 class="reveal" style="font-family:'Outfit',sans-serif;font-weight:800;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-0.02em;line-height:1.15;margin-bottom:2rem;">From zero to running<br><span style="color:var(--text-2);font-weight:600;font-size:0.85em;">in under four weeks.</span></h2>
+
+    <div class="steps-row reveal">
+      <div class="step">
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Discovery</div>
+        <div class="step-body">We map your workflow — where you spend time, what tools you use, and what outputs would make the biggest impact. This becomes the blueprint for your system.</div>
+        <div class="step-accent"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Integration</div>
+        <div class="step-body">I connect your existing tools (CRM, email, databases) to the AI layer using N8N and Python. No rip-and-replace — the system works with what you already have.</div>
+        <div class="step-accent"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Run</div>
+        <div class="step-body">The system runs on a schedule you define — daily, weekly, or triggered by events. You get outputs delivered to your inbox, Slack, or CRM. Zero manual input required.</div>
+        <div class="step-accent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INTEGRATIONS ── -->
+<section class="section integrations-strip">
+  <div class="container">
+    <div class="int-label">Works with your existing stack</div>
+    <div class="int-nodes reveal">
+      <div class="int-node">HubSpot</div>
+      <div class="int-node">Salesforce</div>
+      <div class="int-node">Gmail</div>
+      <div class="int-node">Outlook</div>
+      <div class="int-node">Notion</div>
+      <div class="int-node">Slack</div>
+      <div class="int-node">LinkedIn</div>
+      <div class="int-node">Perplexity</div>
+      <div class="int-node">Hunter.io</div>
+      <div class="int-node">Google Sheets</div>
+      <div class="int-node">Pinecone</div>
+      <div class="int-node">Claude API</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="section cta-section">
+  <div class="container">
+    <h2 class="reveal">Ready to run<br>on <em>autopilot?</em></h2>
+    <p class="reveal">If you're spending more than a few hours a week on research, follow-ups, or context-switching — we should talk. I build these systems to spec.</p>
+    <div class="cta-btns reveal">
+      <a href="mailto:cameronmontbriand@gmail.com" class="btn-primary">Get In Touch →</a>
+      <a href="https://www.linkedin.com/in/cameron-montbriand-ab685216b/" target="_blank" rel="noopener" class="btn-ghost">LinkedIn ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<div class="page-footer">
+  <span>Montbriand AI · Personal AI OS</span>
+  <a href="portfolio.html">← Back to Portfolio</a>
+</div>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('vis'), i * 80);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.07 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
