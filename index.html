@@ -1,1388 +1,577 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Runwell Co. — Cameron Montbriand | AI Automation</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      /* Runwell Co. tokens — see colors_and_type.css for source of truth */
-      --bg:           #0D0D0D;
-      --surface:      #1A1A1A;
-      --surface-2:    #1F1F1F;
-      --surface-3:    #262626;
-      --border:       #262626;
-      --border-2:     #333333;
-      --accent:       #2DD4BF;        /* brand teal — on dark */
-      --accent-soft:  #5EEAD4;
-      --accent-deep:  #0D9488;
-      --accent-glow:  rgba(45, 212, 191, 0.18);
-      --green:        #10B981;
-      --amber:        #F59E0B;
-      --text:         #FFFFFF;
-      --text-2:       rgba(255, 255, 255, 0.72);
-      --text-3:       rgba(255, 255, 255, 0.45);
-      --r:            12px;
-      --r-sm:         6px;
-      --ease:         cubic-bezier(0.22, 1, 0.36, 1);
-      --t:            0.22s;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
-    /* ── VIDEO INTRO ── */
-    .video-section {
-      position: relative;
-      width: 100%;
-      background: var(--bg);
-      overflow: hidden;
-    }
-
-    .video-wrapper {
-      position: relative;
-      width: 100%;
-    }
-
-    .video-frame {
-      position: absolute;
-      top: 0; left: 0;
-      width: 1920px;
-      height: 1080px;
-      border: none;
-      transform-origin: top left;
-    }
-
-    .video-skip-early {
-      position: absolute;
-      top: 4.5rem; right: 1.5rem;
-      z-index: 20;
-      background: rgba(13, 13, 13, 0.7);
-      border: 1px solid var(--border);
-      color: var(--text-2);
-      padding: 0.45rem 1rem;
-      border-radius: var(--r-sm);
-      font-family: 'Sora', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-decoration: none;
-      opacity: 0;
-      transition: opacity 0.5s ease, color var(--t), border-color var(--t);
-      pointer-events: none;
-      backdrop-filter: blur(8px);
-    }
-
-    .video-skip-early.show { opacity: 1; pointer-events: auto; }
-    .video-skip-early:hover { color: var(--accent); border-color: var(--accent); }
-
-    .video-controls {
-      position: absolute;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 0.75rem;
-      z-index: 20;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      pointer-events: none;
-    }
-
-    .video-controls.show { opacity: 1; pointer-events: auto; }
-
-    .btn-replay {
-      background: rgba(13, 13, 13, 0.75);
-      border: 1px solid var(--border-2);
-      color: var(--text-2);
-      padding: 0.6rem 1.4rem;
-      border-radius: var(--r-sm);
-      font-family: 'Sora', sans-serif;
-      font-size: 0.84rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      transition: all var(--t) var(--ease);
-    }
-
-    .btn-replay:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .btn-view-portfolio {
-      background: var(--accent);
-      color: var(--bg);
-      padding: 0.6rem 1.6rem;
-      border-radius: var(--r-sm);
-      text-decoration: none;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.84rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      transition: all var(--t) var(--ease);
-    }
-
-    .btn-view-portfolio:hover {
-      background: var(--accent-soft);
-      transform: translateY(-1px);
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 3rem;
-      background: rgba(13, 13, 13, 0.85);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-    }
-    .nav-logo svg { width: 28px; height: 28px; flex-shrink: 0; }
-    .nav-logo .divider { width: 1px; height: 22px; background: var(--accent); opacity: 0.45; }
-    .nav-logo .wm {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500; font-size: 14px;
-      letter-spacing: 0.18em;
-      color: var(--text);
-      line-height: 1;
-    }
-    .nav-logo .co {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500; font-size: 9px;
-      letter-spacing: 0.36em;
-      color: var(--accent);
-      margin-top: 4px;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2.25rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--text-2);
-      text-decoration: none;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      transition: color var(--t) var(--ease);
-    }
-
-    .nav-links a:hover { color: var(--accent); }
-
-    .nav-cta {
-      background: var(--accent);
-      color: var(--bg);
-      padding: 0.55rem 1.2rem;
-      border-radius: var(--r-sm);
-      text-decoration: none;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      transition: all var(--t) var(--ease);
-    }
-
-    .nav-cta:hover {
-      background: var(--accent-soft);
-      transform: translateY(-1px);
-    }
-
-    /* ── HERO ── */
-    #hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 9rem 3rem 7rem;
-      overflow: hidden;
-      z-index: 1;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 880px;
-    }
-
-    .hero-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      background: transparent;
-      border: 1px solid var(--border-2);
-      border-radius: 100px;
-      padding: 0.35rem 0.95rem;
-      margin-bottom: 2.4rem;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.68rem;
-      font-weight: 500;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--text-2);
-    }
-
-    .live-dot {
-      width: 6px; height: 6px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: livePulse 2.2s ease-in-out infinite;
-    }
-
-    @keyframes livePulse {
-      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-      50%       { opacity: 0.7; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
-    }
-
-    h1 {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500;
-      font-size: clamp(2.4rem, 5.4vw, 4.6rem);
-      line-height: 1.0;
-      letter-spacing: -0.025em;
-      color: var(--text);
-      margin-bottom: 1.6rem;
-    }
-
-    h1 span.accent {
-      display: block;
-      color: var(--accent);
-    }
-
-    .hero-sub {
-      font-family: 'Manrope', sans-serif;
-      font-size: clamp(1rem, 1.5vw, 1.2rem);
-      color: var(--text-2);
-      max-width: 580px;
-      margin-bottom: 1.1rem;
-      line-height: 1.65;
-    }
-
-    .typewriter-line {
-      font-family: 'Sora', sans-serif;
-      font-size: clamp(0.9rem, 1.5vw, 1.05rem);
-      color: var(--accent);
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      min-height: 1.5em;
-      margin-bottom: 2.4rem;
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 2px; height: 1.1em;
-      background: var(--accent);
-      vertical-align: text-bottom;
-      margin-left: 2px;
-      animation: cursorBlink 1.1s step-end infinite;
-    }
-
-    @keyframes cursorBlink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
-    }
-
-    .hero-ctas { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--r-sm);
-      font-family: 'Sora', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      transition: all var(--t) var(--ease);
-      border: 1.5px solid transparent;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-soft);
-      transform: translateY(-1px);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text);
-      border-color: var(--border-2);
-    }
-
-    .btn-ghost:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    /* ── SECTIONS ── */
-    section { position: relative; z-index: 1; padding: 7rem 3rem; }
-
-    .section-tag {
-      font-family: 'Sora', sans-serif;
-      font-size: 0.68rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.36em;
-      color: var(--accent);
-      margin-bottom: 1.4rem;
-    }
-
-    .section-h {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500;
-      font-size: clamp(1.9rem, 3.5vw, 2.9rem);
-      letter-spacing: -0.025em;
-      line-height: 1.1;
-      margin-bottom: 0.9rem;
-    }
-
-    .section-sub {
-      font-family: 'Manrope', sans-serif;
-      color: var(--text-2);
-      font-size: 1.0625rem;
-      max-width: 560px;
-      margin-bottom: 3.5rem;
-      line-height: 1.65;
-    }
-
-    .container { max-width: 1120px; margin: 0 auto; }
-
-    /* ── ABOUT ── */
-    #about {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .pillars {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .pillar {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 2rem;
-      transition: border-color var(--t) var(--ease), transform var(--t) var(--ease);
-    }
-
-    .pillar:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-    }
-
-    .pillar-accent {
-      width: 2rem;
-      height: 2px;
-      background: var(--accent);
-      border-radius: 2px;
-      margin-bottom: 1.4rem;
-      display: block;
-    }
-
-    .pillar-title {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500;
-      font-size: 1.15rem;
-      letter-spacing: -0.01em;
-      margin-bottom: 0.6rem;
-    }
-
-    .pillar-body {
-      font-family: 'Manrope', sans-serif;
-      font-size: 0.9375rem;
-      color: var(--text-2);
-      line-height: 1.65;
-    }
-
-    /* ── PROJECTS ── */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-    }
-
-    .project-card:nth-child(5) {
-      grid-column: 1 / -1;
-      max-width: 480px;
-      justify-self: center;
-      width: 100%;
-    }
-
-    .project-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 1.8rem;
-      transition: all var(--t) var(--ease);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .project-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--accent);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform var(--t) var(--ease);
-    }
-
-    .project-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-    }
-
-    .project-card:hover::after { transform: scaleX(1); }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.22rem 0.7rem;
-      border-radius: 100px;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.62rem;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .badge-cat {
-      background: transparent;
-      color: var(--accent);
-      border: 1px solid rgba(45, 212, 191, 0.4);
-    }
-
-    .badge-live {
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .badge-live::before {
-      content: '';
-      width: 5px; height: 5px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: livePulse 2s infinite;
-    }
-
-    .badge-progress {
-      background: rgba(245, 158, 11, 0.1);
-      color: var(--amber);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .badge-built {
-      background: rgba(45, 212, 191, 0.1);
-      color: var(--accent);
-      border: 1px solid rgba(45, 212, 191, 0.3);
-    }
-
-    .badge-complete {
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .card-title {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500;
-      font-size: 1.3rem;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-      margin-bottom: 0.7rem;
-    }
-
-    .card-problem {
-      font-family: 'Manrope', sans-serif;
-      font-size: 0.9rem;
-      color: var(--text-2);
-      line-height: 1.6;
-      margin-bottom: 1.25rem;
-    }
-
-    .tech-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-bottom: 1.4rem;
-    }
-
-    .chip {
-      background: var(--surface-2);
-      border: 1px solid var(--border-2);
-      color: var(--text-2);
-      padding: 0.18rem 0.55rem;
-      border-radius: 4px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.02em;
-    }
-
-    .card-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-
-    .btn-demo-sm {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      background: var(--accent);
-      color: var(--bg);
-      padding: 0.45rem 0.95rem;
-      border-radius: var(--r-sm);
-      font-family: 'Sora', sans-serif;
-      font-size: 0.76rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      transition: all var(--t) var(--ease);
-      white-space: nowrap;
-    }
-
-    .btn-demo-sm:hover {
-      background: var(--accent-soft);
-      transform: translateY(-1px);
-    }
-
-    .pipeline-strip {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0;
-      margin-top: 0.75rem;
-      margin-bottom: 0.25rem;
-    }
-    .pipe-step {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.68rem;
-      font-weight: 500;
-      color: var(--text-2);
-      background: var(--surface-2);
-      border: 1px solid var(--border-2);
-      border-radius: 4px;
-      padding: 0.25rem 0.5rem;
-      white-space: nowrap;
-    }
-    .pipe-step.pipe-end {
-      color: var(--accent);
-      border-color: rgba(45, 212, 191, 0.4);
-      background: rgba(45, 212, 191, 0.08);
-    }
-    .pipe-arrow {
-      font-size: 0.7rem;
-      color: var(--text-3);
-      padding: 0 4px;
-    }
-
-    .btn-expand {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      background: transparent;
-      color: var(--text-2);
-      padding: 0.45rem 0.95rem;
-      border-radius: var(--r-sm);
-      font-family: 'Sora', sans-serif;
-      font-size: 0.76rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      border: 1px solid var(--border-2);
-      cursor: pointer;
-      transition: all var(--t) var(--ease);
-    }
-
-    .btn-expand:hover, .btn-expand.open {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    /* ── PROJECT DETAILS (accordion) ── */
-    .project-details-wrap {
-      max-width: 1120px;
-      margin: 0 auto;
-    }
-
-    .detail-panel {
-      display: none;
-      background: var(--surface);
-      border: 1px solid var(--accent);
-      border-radius: var(--r);
-      margin: 0.5rem 0 1rem;
-      overflow: hidden;
-      animation: panelIn 0.22s var(--ease);
-    }
-
-    .detail-panel.visible { display: block; }
-
-    @keyframes panelIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .detail-inner { padding: 2.2rem 2.5rem; }
-
-    .detail-cols {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .detail-col h4 {
-      font-family: 'Sora', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.32em;
-      color: var(--accent);
-      margin-bottom: 0.85rem;
-    }
-
-    .detail-col p {
-      font-family: 'Manrope', sans-serif;
-      color: var(--text-2);
-      font-size: 0.9rem;
-      line-height: 1.7;
-    }
-
-    .results-strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      overflow: hidden;
-    }
-
-    .result-item {
-      flex: 1;
-      min-width: 130px;
-      padding: 1.1rem 1.4rem;
-      border-right: 1px solid var(--border);
-    }
-
-    .result-item:last-child { border-right: none; }
-
-    .result-num {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500;
-      font-size: 1.7rem;
-      color: var(--accent);
-      letter-spacing: -0.02em;
-      line-height: 1;
-      margin-bottom: 0.35rem;
-    }
-
-    .result-lbl {
-      font-family: 'Manrope', sans-serif;
-      font-size: 0.775rem;
-      color: var(--text-2);
-    }
-
-    /* ── SERVICES ── */
-    #services { text-align: center; }
-    #services .section-sub { margin-left: auto; margin-right: auto; }
-
-    .services-tags {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.75rem;
-      max-width: 700px;
-      margin: 0 auto 3rem;
-    }
-
-    .svc-tag {
-      background: var(--surface);
-      border: 1px solid var(--border-2);
-      color: var(--text-2);
-      padding: 0.65rem 1.3rem;
-      border-radius: var(--r);
-      font-family: 'Sora', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      transition: all var(--t) var(--ease);
-    }
-
-    .svc-tag:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: translateY(-2px);
-    }
-
-    .cta-card {
-      max-width: 620px;
-      margin: 0 auto;
-      background: var(--surface);
-      border: 1px solid var(--accent);
-      border-radius: var(--r);
-      padding: 3rem 2.5rem;
-    }
-
-    .cta-card h3 {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500;
-      font-size: 1.9rem;
-      letter-spacing: -0.025em;
-      margin-bottom: 0.75rem;
-    }
-
-    .cta-card p {
-      font-family: 'Manrope', sans-serif;
-      color: var(--text-2);
-      font-size: 1rem;
-      margin-bottom: 2rem;
-      line-height: 1.65;
-    }
-
-    .cta-btns { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
-
-    /* ── FOOTER ── */
-    footer {
-      position: relative;
-      z-index: 1;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 2rem 3rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .footer-brand {
-      display: flex; align-items: center; gap: 12px;
-    }
-    .footer-brand svg { width: 24px; height: 24px; flex-shrink: 0; }
-    .footer-brand .wm {
-      font-family: 'Sora', sans-serif;
-      font-weight: 500; font-size: 12px;
-      letter-spacing: 0.18em;
-      color: var(--text);
-    }
-    .footer-brand .pipe { color: var(--text-3); margin: 0 4px; }
-    .footer-brand .tag {
-      font-family: 'Sora', sans-serif;
-      font-size: 11px; letter-spacing: 0.28em;
-      text-transform: uppercase; color: var(--text-3);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .footer-links a {
-      font-family: 'Sora', sans-serif;
-      color: var(--text-2);
-      text-decoration: none;
-      font-size: 0.82rem;
-      letter-spacing: 0.04em;
-      transition: color var(--t);
-    }
-
-    .footer-links a:hover { color: var(--accent); }
-
-    .footer-copy {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: var(--text-3);
-      font-size: 0.75rem;
-      letter-spacing: 0.04em;
-    }
-
-    /* ── SCROLL REVEAL ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
-    }
-
-    .reveal.vis {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 900px) {
-      nav { padding: 0.9rem 1.5rem; }
-      .nav-links { display: none; }
-      section { padding: 5rem 1.5rem; }
-      #hero { padding: 8rem 1.5rem 5rem; }
-      .projects-grid { grid-template-columns: 1fr 1fr; }
-      .project-card:nth-child(5) {
-        grid-column: 1 / -1;
-        max-width: 100%;
-      }
-      .detail-cols { grid-template-columns: 1fr; }
-      footer { flex-direction: column; align-items: flex-start; }
-    }
-
-    @media (max-width: 600px) {
-      .projects-grid { grid-template-columns: 1fr; }
-      .project-card:nth-child(5) { grid-column: auto; }
-      .results-strip { flex-direction: column; }
-      .result-item { border-right: none; border-bottom: 1px solid var(--border); }
-      .result-item:last-child { border-bottom: none; }
-    }
-
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cameron Montbriand — Pre-Sales Application Engineer</title>
+<meta name="description" content="Pre-sales application engineer specialising in robotic welding cells: layouts, reach studies, cycle time analysis and automation feasibility. $19.5M in delivered systems.">
+<meta name="author" content="Cameron Montbriand">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://cameroon3426.github.io/Portfolio/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cameron Montbriand — Pre-Sales Application Engineer">
+<meta property="og:description" content="Pre-sales application engineer specialising in robotic welding cells: layouts, reach studies, cycle time analysis and automation feasibility. $19.5M in delivered systems.">
+<meta property="og:image" content="https://cameroon3426.github.io/Portfolio/assets/og-cover.jpg">
+<meta property="og:url" content="https://cameroon3426.github.io/Portfolio/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{
+    --paper:#F5F4F1; --sheet:#FFFFFF; --ink:#17181B; --ink-2:#55575B; --ink-3:#6E7074;
+    --rule:#DDDBD5; --rule-2:#C4C1B9; --deep:#1B3A4B; --arc:#AF5228;
+    --band:#1D2226; --band-ink:#E7E6E2; --band-2:#9AA0A4;
+    --sans:"Segoe UI Variable Display","Segoe UI",Inter,system-ui,-apple-system,sans-serif;
+    --mono:"Cascadia Mono",Consolas,"SF Mono",ui-monospace,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --pad:clamp(1.25rem,5vw,4rem);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+       line-height:1.62;margin:0;-webkit-font-smoothing:antialiased}
+  img{max-width:100%;display:block}
+  a{color:inherit}
+  h1,h2,h3,h4{margin:0;text-wrap:balance}
+  .mono{font-family:var(--mono);font-size:.66rem;letter-spacing:.15em;text-transform:uppercase}
+  .shell{max-width:1240px;margin:0 auto;padding:0 var(--pad)}
+
+  /* nav */
+  .nav{border-bottom:1px solid var(--ink);position:sticky;top:0;background:var(--paper);z-index:9}
+  .nav .shell{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem;align-items:center;
+              justify-content:space-between;padding-top:.65rem;padding-bottom:.65rem}
+  .brand{font-family:var(--serif);font-size:1.2rem;letter-spacing:-.01em;line-height:1.15}
+  .brand span{display:block;color:var(--ink-3)}
+  .navlinks{display:flex;flex-wrap:wrap;gap:0 1.1rem;align-items:center;
+            margin-right:-.4rem;color:var(--ink-2)}
+  .navlinks a{text-decoration:none;display:inline-flex;align-items:center;
+              padding:.55rem .4rem;min-height:44px}
+  .navlinks a:hover,.navlinks a:focus-visible{color:var(--deep)}
+
+  /* hero */
+  .hero{padding:clamp(2.5rem,6vw,4.5rem) 0 0}
+  .hero .grid{display:grid;grid-template-columns:1.15fr 1fr;gap:1.5rem clamp(2rem,5vw,4rem);align-items:end}
+  .hero .mono{color:var(--ink-3);margin-bottom:1.4rem;display:block}
+  .hero h1{font-family:var(--serif);font-size:clamp(2.3rem,5.6vw,3.9rem);line-height:1.03;
+           letter-spacing:-.022em;font-weight:400}
+  .hero h1 em{font-style:italic;color:var(--deep)}
+  .hero p{color:var(--ink-2);font-size:1.02rem;margin:0;max-width:48ch}
+  .hero p b{color:var(--ink);font-weight:600}
+  .heroindex{list-style:none;margin:1.25rem 0 0;padding:0;border-top:1px solid var(--rule);
+             display:grid}
+  .heroindex li{border-bottom:1px solid var(--rule)}
+  .heroindex a{display:flex;gap:.85rem;align-items:baseline;padding:.5rem 0;
+               text-decoration:none;color:var(--ink-2);font-size:.93rem}
+  .heroindex a:hover,.heroindex a:focus-visible{color:var(--deep)}
+  .heroindex span{font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;color:var(--ink-3)}
+  .heroacts{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.25rem}
+  .btn{font-family:var(--mono);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;
+       text-decoration:none;padding:.65rem 1.1rem;border:1px solid var(--ink);display:inline-block}
+  .btn:hover,.btn:focus-visible{background:var(--ink);color:var(--paper)}
+  .btn.ghost{border-color:var(--rule-2);color:var(--ink-2)}
+  .btn.ghost:hover,.btn.ghost:focus-visible{border-color:var(--ink);background:transparent;color:var(--ink)}
+
+  /* plate */
+  .plate{margin-top:clamp(2rem,5vw,3.25rem);border:1px solid var(--ink);background:var(--sheet);padding:clamp(.6rem,1.4vw,1rem)}
+  .plate .cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem 1.5rem;
+              border-top:1px solid var(--rule);margin-top:.85rem;padding-top:.7rem}
+  .plate .cap span{font-family:var(--mono);font-size:.69rem;letter-spacing:.09em;
+                   text-transform:uppercase;color:var(--ink-3)}
+  .plate .cap b{color:var(--ink-2);font-weight:400}
+
+  /* stats */
+  .stats{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+         margin-top:clamp(2rem,5vw,3rem)}
+  .stats .shell{display:grid;grid-template-columns:repeat(4,1fr);padding-top:0;padding-bottom:0}
+  .stats div{padding:1.5rem 0 1.6rem;border-left:1px solid var(--rule);padding-left:1.5rem}
+  .stats div:first-child{border-left:0;padding-left:0}
+  .stats .v{font-family:var(--serif);font-size:clamp(1.5rem,3.2vw,2.1rem);line-height:1;
+            letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stats .l{color:var(--ink-3);margin-top:.55rem}
+
+  /* section */
+  .sec{padding:clamp(3rem,7vw,5rem) 0 0}
+  .sechd{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;
+         gap:.5rem 1.5rem;border-bottom:1px solid var(--ink);padding-bottom:.7rem;margin-bottom:2rem}
+  .sechd h2{font-family:var(--serif);font-size:clamp(1.4rem,3vw,1.85rem);font-weight:400;letter-spacing:-.015em}
+  .sechd .mono{color:var(--ink-3)}
+
+  /* case */
+  .case{padding-bottom:clamp(2.5rem,6vw,3.5rem);margin-bottom:clamp(2.5rem,6vw,3.5rem);
+        border-bottom:1px solid var(--rule)}
+  .case:last-child{border-bottom:0;margin-bottom:0}
+  .casehd{display:grid;grid-template-columns:3.2rem 1fr;gap:1.5rem;margin-bottom:1.5rem}
+  .cnum{font-family:var(--serif);font-size:2rem;color:var(--deep);line-height:.9}
+  .tagrow{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem}
+  .prov{font-family:var(--mono);font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;
+        padding:.18rem .55rem;border:1px solid #A9C7B0;background:#EDF4EE;color:#1F5B2E}
+  .prov.pre{border-color:#B9CBD6;background:#EBF1F5;color:#1B3A4B}
+  .prov.live{border-color:#C9A98D;background:#FBF1E9;color:#8A4A1E}
+  .ctype{font-family:var(--mono);font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;
+         padding:.18rem .55rem;border:1px solid var(--rule-2);color:var(--ink-3)}
+  .case h3{font-family:var(--serif);font-size:clamp(1.35rem,3vw,1.75rem);font-weight:400;
+           letter-spacing:-.015em;line-height:1.15;margin-bottom:.6rem}
+  .case > .casehd p{color:var(--ink-2);margin:0;max-width:62ch}
+  .carwrap.onecol{grid-template-columns:1fr}
+  .carwrap.onecol .car > div{grid-template-columns:7rem 1fr}
+  .carwrap.onecol .car dd{max-width:78ch}
+  .carwrap{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem clamp(2rem,4vw,3rem);
+           margin-top:1.75rem;align-items:start}
+  .car{margin:0;display:grid;gap:.9rem}
+  .car > div{display:grid;grid-template-columns:5.5rem 1fr;gap:1rem;align-items:baseline}
+  .car dt{font-family:var(--mono);font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;
+          color:var(--ink-3);margin:0}
+  .car dd{margin:0;color:var(--ink-2);font-size:.94rem}
+  .car dd b{color:var(--ink);font-weight:600}
+  .skills{display:flex;flex-wrap:wrap;gap:.4rem .9rem;margin-top:1.2rem;
+          font-family:var(--mono);font-size:.68rem;letter-spacing:.11em;
+          text-transform:uppercase;color:var(--ink-3)}
+
+  /* throughput table */
+  .scroller{overflow-x:auto}
+  .tt{width:100%;min-width:330px;border-collapse:collapse;font-size:.88rem}
+  .tt caption{text-align:left;font-family:var(--mono);font-size:.67rem;letter-spacing:.12em;
+              text-transform:uppercase;color:var(--ink-3);padding-bottom:.6rem}
+  .tt th,.tt td{text-align:right;padding:.5rem .4rem;border-bottom:1px solid var(--rule)}
+  .tt th:first-child,.tt td:first-child{text-align:left;padding-left:0}
+  .tt td:last-child,.tt th:last-child{padding-right:0}
+  .tt thead th{font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;
+               color:var(--ink-3);font-weight:400;border-bottom-color:var(--ink)}
+  .tt tbody td{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+  .tt tbody td:first-child{color:var(--ink)}
+  .tt .hot{color:var(--arc);font-weight:600}
+  .tt tfoot td{border-bottom:0;padding-top:.7rem;font-variant-numeric:tabular-nums}
+  .tt tfoot .k{font-family:var(--mono);font-size:.67rem;letter-spacing:.11em;
+               text-transform:uppercase;color:var(--ink-3)}
+  .ramp{margin-top:1.4rem;display:grid;gap:.55rem}
+  .ramp .row{display:grid;grid-template-columns:8.5rem 1fr 5rem;gap:.8rem;align-items:center}
+  .ramp .lab{font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;
+             text-transform:uppercase;color:var(--ink-3)}
+  .ramp .bar{height:12px;background:var(--rule)}
+  .ramp .bar i{display:block;height:100%;background:var(--deep)}
+  .ramp .row.goal .bar i{background:var(--arc)}
+  .ramp .n{text-align:right;font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--ink-2)}
+
+  .more{border-top:1px solid var(--rule);padding-top:1.75rem;margin-top:clamp(2.5rem,6vw,3.5rem)}
+  .more h4{color:var(--ink-3);margin-bottom:1.1rem}
+  .morerow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,4vw,3rem);align-items:center}
+  .morerow p{color:var(--ink-2);margin:0;font-size:.94rem;max-width:46ch}
+  .morerow p b{color:var(--ink);font-weight:600}
+
+  /* floor photos */
+  .floor{display:grid;grid-template-columns:1.05fr .95fr;gap:1rem;align-items:start}
+  .floorcol{display:grid;gap:1rem}
+  .ph{border:1px solid var(--rule-2);background:var(--sheet);padding:.5rem}
+  .ph figcaption{font-family:var(--mono);font-size:.67rem;letter-spacing:.09em;text-transform:uppercase;
+                 color:var(--ink-3);border-top:1px solid var(--rule);margin-top:.55rem;padding-top:.5rem}
+  .ph img,.ph video{width:100%;display:block}
+
+  /* capabilities */
+  .caps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0}
+  .caps > div{border-left:1px solid var(--rule);padding:0 1.5rem 1.75rem}
+  .caps > div:first-child{border-left:0;padding-left:0}
+  .caps h4{font-family:var(--mono);font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;
+           color:var(--deep);margin-bottom:.8rem}
+  .caps ul{margin:0;padding:0;list-style:none;display:grid;gap:.55rem}
+  .caps li{font-size:.9rem;color:var(--ink-2)}
+  .caps li b{color:var(--ink);font-weight:600}
+
+  /* ai band */
+  .band{background:var(--band);color:var(--band-ink);margin-top:clamp(3rem,7vw,5rem);
+        padding:clamp(2.5rem,6vw,4rem) 0}
+  .band .sechd{border-bottom-color:#3A4247}
+  .band .sechd h2{color:var(--band-ink)}
+  .band .sechd .mono,.band .lede{color:var(--band-2)}
+  .band .lede{max-width:62ch;margin:0 0 2rem;font-size:.96rem}
+  .feature{border-top:1px solid #3A4247;border-bottom:1px solid #3A4247;
+           padding:clamp(1.75rem,4vw,2.5rem) 0;margin-bottom:clamp(2rem,5vw,2.75rem)}
+  .featshot{margin:0 0 clamp(1.5rem,3vw,2rem);border:1px solid #3A4247;background:#0F1214}
+  .featshot img{width:100%}
+  .featgrid{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(1.5rem,4vw,3rem);align-items:start}
+  .featgrid .mono{color:#8FB8C7;display:block;margin-bottom:.75rem}
+  .featgrid h3{font-family:var(--serif);font-size:clamp(1.5rem,3.2vw,2rem);font-weight:400;
+               letter-spacing:-.015em;color:var(--band-ink);margin-bottom:.7rem}
+  .featgrid p{color:var(--band-2);margin:0 0 1.4rem;max-width:52ch}
+  .featlist{margin:0;padding-left:1.1rem;display:grid;gap:.55rem;
+            color:var(--band-2);font-size:.9rem}
+  .featlist b{color:var(--band-ink);font-weight:600}
+  .btn.light{border-color:#8FB8C7;color:#8FB8C7}
+  .btn.light:hover,.btn.light:focus-visible{background:#8FB8C7;color:var(--band)}
+  .aigrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1.25rem}
+  .ai{border-top:1px solid #3A4247;padding-top:.9rem}
+  .ai .mono{color:#8FB8C7;display:block;margin-bottom:.5rem}
+  .ai h4{font-size:.98rem;font-weight:600;margin-bottom:.4rem}
+  .ai p{margin:0;font-size:.85rem;color:var(--band-2)}
+
+  /* about + contact */
+  .about p{max-width:68ch}
+  .about p{color:var(--ink-2);margin:0 0 1rem;max-width:60ch}
+  .about p b{color:var(--ink);font-weight:600}
+  .contact{border-top:2px solid var(--ink);margin-top:clamp(3rem,7vw,4.5rem);
+           padding:2rem 0 clamp(3rem,6vw,4rem)}
+  .contact h2{font-family:var(--serif);font-size:clamp(1.6rem,4vw,2.4rem);font-weight:400;
+              letter-spacing:-.02em;margin-bottom:1.2rem;max-width:20ch}
+  .clinks{display:flex;flex-wrap:wrap;gap:.6rem}
+
+  @media(max-width:860px){
+    .hero .grid,.carwrap,.floor,.morerow,.featgrid{grid-template-columns:1fr}
+    .about .ph{max-width:420px}
+    .stats .shell{grid-template-columns:1fr 1fr}
+    .stats div:nth-child(3){border-left:0;padding-left:0}
+    .caps > div{border-left:0;padding-left:0}
+  }
+  @media(max-width:520px){
+    .ramp .row{grid-template-columns:6.5rem 1fr 3.5rem;gap:.5rem}
+    .car > div{grid-template-columns:1fr;gap:.2rem}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script>
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('video[autoplay]').forEach(function (v) {
+        v.removeAttribute('autoplay'); v.pause();
+      });
+    });
+  }
+</script>
 </head>
 <body>
-
-
-<!-- ── VIDEO INTRO ── -->
-<section class="video-section" id="video-section">
-  <div class="video-wrapper" id="videoWrapper">
-    <iframe
-      src="portfolio-intro/index.html"
-      id="introFrame"
-      class="video-frame"
-      scrolling="no"
-      sandbox="allow-scripts allow-same-origin"
-    ></iframe>
+<header class="nav">
+  <div class="shell">
+    <div class="brand">Cameron Montbriand<span class="mono">Application engineer</span></div>
+    <nav class="navlinks mono">
+      <a href="#work">Work</a><a href="#floor">On the floor</a><a href="#caps">Capabilities</a>
+      <a href="#ai">AI</a><a href="#about">About</a><a href="#contact">Contact</a>
+    </nav>
   </div>
-  <a href="#hero" class="video-skip-early" id="skipEarly">SKIP ↓</a>
-  <div class="video-controls" id="videoControls">
-    <button class="btn-replay" onclick="replayIntro()">↺ Replay</button>
-    <a href="#hero" class="btn-view-portfolio">View Portfolio ↓</a>
-  </div>
-</section>
+</header>
 
-<!-- ── NAVIGATION ── -->
-<nav>
-  <a href="#hero" class="nav-logo" aria-label="Runwell Co.">
-    <svg viewBox="0 0 100 100" fill="none" aria-hidden="true"><rect x="10" y="32" width="58" height="58" rx="7" fill="#2DD4BF"/><rect x="32" y="10" width="58" height="58" rx="7" fill="none" stroke="#2DD4BF" stroke-width="4"/></svg>
-    <div class="divider"></div>
-    <div>
-      <div class="wm">RUNWELL</div>
-      <div class="co">CO.</div>
-    </div>
-  </a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#services">Work With Me</a></li>
-  </ul>
-  <a href="mailto:cameronmontbriand@gmail.com" class="nav-cta">Get In Touch →</a>
-</nav>
-
-<!-- ── HERO ── -->
-<section id="hero">
-  <div class="hero-content">
-
-    <div class="hero-pill">
-      <div class="live-dot"></div>
-      OPEN TO AI AUTOMATION PROJECTS
+<main>
+<section class="hero">
+  <div class="shell">
+    <div class="grid">
+      <div>
+        <span class="mono">Pre-sales application engineer &middot; robotic welding and automation</span>
+        <h1>Proven on paper before it's <em>bought</em>.</h1>
+      </div>
+      <div>
+        <p>I take a customer's part and answer the only question that matters: can a robot actually
+          weld this, at rate, in the space available. <b>Then I draw the cell that does it.</b>
+          Six years of that work sits behind $19.5M in delivered systems.</p>
+        <ol class="heroindex">
+          <li><a href="#work"><span>01</span> Enclosed cell design &amp; reach study</a></li>
+          <li><a href="#work"><span>02</span> Cycle time and throughput analysis</a></li>
+          <li><a href="#work"><span>03</span> Line optimization &mdash; live project</a></li>
+        </ol>
+        <div class="heroacts">
+          <a class="btn" href="#work">See the work</a>
+          <a class="btn ghost" href="#contact">Get in touch</a>
+        </div>
+      </div>
     </div>
 
-    <h1>
-      Cameron<br>
-      <span class="accent">Montbriand</span>
-    </h1>
-
-    <p class="hero-sub">
-      I build AI systems that handle the work nobody wants to do manually —
-      prospect research, document generation, support automation, training at scale.
-    </p>
-
-    <div class="typewriter-line">
-      <span id="typewriter-text"></span><span class="cursor"></span>
-    </div>
-
-    <div class="hero-ctas">
-      <a href="#projects" class="btn btn-primary">View my work ↓</a>
-      <a href="https://www.linkedin.com/in/cameron-montbriand-ab685216b/" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn ↗</a>
-      <a href="mailto:cameronmontbriand@gmail.com" class="btn btn-ghost">Email me</a>
-    </div>
-
+    <figure class="plate" style="margin-bottom:0">
+      <img fetchpriority="high" src="assets/hero-enclosed.jpg" alt="Engineering layout drawing of an enclosed robotic welding cell: plan view, two elevations and an isometric view, with robot reach envelopes, component callouts and overall dimensions in millimetres and feet">
+      <figcaption class="cap">
+        <span>Enclosed pick-and-place cell &middot; heavy equipment OEM</span>
+        <span><b>Reach envelopes shown &middot; 12,335 &times; 8,916 mm &middot; drawn in SolidWorks</b></span>
+      </figcaption>
+    </figure>
   </div>
 </section>
 
-<!-- ── ABOUT ── -->
-<section id="about">
-  <div class="container">
-    <div class="section-tag">// WHO I AM</div>
-    <h2 class="section-h">AI automation, built for the real world.</h2>
-    <p class="section-sub">Not demos. Not prototypes. Actual systems in production, solving problems that matter in complex industrial and enterprise environments.</p>
-
-    <div class="pillars">
-      <div class="pillar reveal">
-        <div class="pillar-accent"></div>
-        <div class="pillar-title">Industrial domain expertise</div>
-        <p class="pillar-body">Four years of engineering and 2.5 years in industrial automation sales — I understand the business problems behind the automation, not just the tools.</p>
-      </div>
-      <div class="pillar reveal">
-        <div class="pillar-accent"></div>
-        <div class="pillar-title">Full-stack AI integration</div>
-        <p class="pillar-body">Claude API, N8N workflows, vector databases, HubSpot, Python document automation. I connect the pieces other builders leave as one-offs.</p>
-      </div>
-      <div class="pillar reveal">
-        <div class="pillar-accent"></div>
-        <div class="pillar-title">Systems that actually ship</div>
-        <p class="pillar-body">Every project below is in production, used by real people to do real work. No slide decks. No concept demos. Working software.</p>
-      </div>
-    </div>
+<div class="stats">
+  <div class="shell">
+    <div><div class="v">$19.5M</div><div class="l mono">Sales supported</div></div>
+    <div><div class="v">60+</div><div class="l mono">Cell layouts drawn</div></div>
+    <div><div class="v">200+</div><div class="l mono">Systems in the field</div></div>
+    <div><div class="v">11</div><div class="l mono">States covered</div></div>
   </div>
-</section>
+</div>
 
-<!-- ── PROJECTS ── -->
-<section id="projects">
-  <div class="container">
-    <div class="section-tag">// PORTFOLIO</div>
-    <h2 class="section-h">5 projects. Real problems. Working systems.</h2>
-    <p class="section-sub">Built across AI frameworks, workflow automation, document generation, and sales intelligence.</p>
+<section class="sec" id="work">
+  <div class="shell">
+    <div class="sechd"><h2>Selected work</h2><span class="mono">2022 &mdash; 2026</span></div>
 
-    <div class="projects-grid" id="projects-grid">
-
-      <!-- Card 1: AIOS -->
-      <div class="project-card reveal">
-        <div class="card-top">
-          <span class="badge badge-cat">Personal AI Framework</span>
-          <span class="badge badge-live">Live</span>
-        </div>
-        <div class="card-title">AI Operating System</div>
-        <p class="card-problem">Managing a high-value sales territory across 11 states required constant context-switching — CRM, prospect research, competitive intel, docs. The overhead was unsustainable.</p>
-        <div class="tech-chips">
-          <span class="chip">Claude API</span>
-          <span class="chip">HubSpot</span>
-          <span class="chip">Perplexity</span>
-          <span class="chip">Hunter.io</span>
-          <span class="chip">Python</span>
-        </div>
-        <div class="card-actions">
-          <a href="demo-ai-os.html" target="_blank" class="btn-demo-sm">Live demo ↗</a>
-          <button class="btn-expand" onclick="toggleDetail('aios', this)">Details ↓</button>
+    <!-- 01 -->
+    <article class="case">
+      <div class="casehd">
+        <div class="cnum">01</div>
+        <div>
+          <div class="tagrow"><span class="prov">Designed by me</span>
+            <span class="ctype">Cell design</span><span class="ctype">Reach study</span></div>
+          <h3>An enclosed cell that had to load itself</h3>
+          <p>A Fortune 100 heavy equipment maker needed a welding cell that could run without an
+            operator inside the guarding, on parts too heavy to hand-load.</p>
         </div>
       </div>
+      <div class="carwrap">
+        <dl class="car">
+          <div><dt>Problem</dt><dd>Manual load time was eating the cycle, and the part could not be
+            positioned safely by hand.</dd></div>
+          <div><dt>Approach</dt><dd>Laid out a pick-and-place table and tool drop-off station inside
+            the envelope, then proved the robot could reach every joint on a 100 kN headstock with a
+            4 m rail before committing to the footprint.</dd></div>
+          <div><dt>Result</dt><dd>A <b>12.3 m by 8.9 m</b> enclosed cell, approved and built, with
+            tool changeover handled inside the cell instead of by an operator.</dd></div>
+        </dl>
+        <figure class="plate" style="margin:0">
+          <img loading="lazy" decoding="async" src="assets/dwg-trunnions.jpg" alt="Layout drawing of a double-station robotic welding cell with trunnion positioners, showing overlapping robot reach envelopes in plan view">
+          <figcaption class="cap"><span>Related: double-station variant</span>
+            <span><b>Trunnion positioners</b></span></figcaption>
+        </figure>
+      </div>
+      <div class="skills"><span>SolidWorks</span><span>Reach envelope analysis</span>
+        <span>Weld access</span><span>Layout approval</span></div>
+    </article>
 
-      <!-- Card 2: Trainer -->
-      <div class="project-card reveal">
-        <div class="card-top">
-          <span class="badge badge-cat">Enterprise Training</span>
-          <span class="badge badge-progress">In Progress</span>
-        </div>
-        <div class="card-title">Modular Training System</div>
-        <p class="card-problem">A global industrial OEM had 111 service manuals and zero structured training. Technicians learned by shadowing — a single point of failure at scale.</p>
-        <div class="tech-chips">
-          <span class="chip">HTML/CSS</span>
-          <span class="chip">Claude API</span>
-          <span class="chip">Python</span>
-          <span class="chip">Instructional Design</span>
-        </div>
-        <div class="card-actions">
-          <a href="AIS-OS/projects/cloos-trainer/qirox-foundation/module-01-system-overview.html" target="_blank" rel="noopener" class="btn-demo-sm">View module ↗</a>
-          <button class="btn-expand" onclick="toggleDetail('trainer', this)">Details ↓</button>
+    <!-- 02 -->
+    <article class="case">
+      <div class="casehd">
+        <div class="cnum">02</div>
+        <div>
+          <div class="tagrow"><span class="prov pre">Analysis and pre-sales by me</span>
+            <span class="ctype">Cycle time</span><span class="ctype">Throughput model</span></div>
+          <h3>The throughput number that set the plan</h3>
+          <p>A structural steel fabricator was welding 1,200 parts a week by hand and wanted to know
+            what automation would actually buy them, not what a brochure claimed.</p>
         </div>
       </div>
-
-      <!-- Card 3: Gmail N8N -->
-      <div class="project-card reveal">
-        <div class="card-top">
-          <span class="badge badge-cat">Workflow Automation</span>
-          <span class="badge badge-built">Built</span>
-        </div>
-        <div class="card-title">Gmail Support Automation</div>
-        <p class="card-problem">A service team drowning in support emails had no process — replies were slow, inconsistent, and relied entirely on engineers already stretched thin.</p>
-        <div class="tech-chips">
-          <span class="chip">N8N</span>
-          <span class="chip">Claude API</span>
-          <span class="chip">Gemini</span>
-          <span class="chip">Pinecone</span>
-          <span class="chip">Gmail API</span>
-        </div>
-        <div class="pipeline-strip">
-          <span class="pipe-step">Gmail Inbox</span>
-          <span class="pipe-arrow">→</span>
-          <span class="pipe-step">N8N Trigger</span>
-          <span class="pipe-arrow">→</span>
-          <span class="pipe-step">Gemini Embed</span>
-          <span class="pipe-arrow">→</span>
-          <span class="pipe-step">Pinecone Search</span>
-          <span class="pipe-arrow">→</span>
-          <span class="pipe-step">Claude Draft</span>
-          <span class="pipe-arrow">→</span>
-          <span class="pipe-step pipe-end">✓ Human Review</span>
-        </div>
-        <div class="card-actions">
-          <button class="btn-expand" onclick="toggleDetail('gmail', this)">Details ↓</button>
-        </div>
-      </div>
-
-      <!-- Card 4: Chatbot -->
-      <div class="project-card reveal">
-        <div class="card-top">
-          <span class="badge badge-cat">AI Assistant</span>
-          <span class="badge badge-complete">Complete</span>
-        </div>
-        <div class="card-title">AI Service Chatbot</div>
-        <p class="card-problem">111 technical manuals. Technicians in the field, under pressure, with no fast answers. Senior engineers fielded the same questions repeatedly — at the cost of their own work.</p>
-        <div class="tech-chips">
-          <span class="chip">Claude API</span>
-          <span class="chip">Python</span>
-          <span class="chip">Pinecone</span>
-          <span class="chip">RAG</span>
-        </div>
-        <div class="card-actions">
-          <a href="demo-chatbot.html" target="_blank" class="btn-demo-sm">Live demo ↗</a>
-          <button class="btn-expand" onclick="toggleDetail('chatbot', this)">Details ↓</button>
-        </div>
-      </div>
-
-      <!-- Card 5: Sales Rep (centered last) -->
-      <div class="project-card reveal">
-        <div class="card-top">
-          <span class="badge badge-cat">Sales Intelligence</span>
-          <span class="badge badge-live">Active</span>
-        </div>
-        <div class="card-title">Sales Rep AI System</div>
-        <p class="card-problem">11-state territory, long sales cycles, manual CRM entry killing hours each week. Prospect coverage was inconsistent and opportunities got missed because research took too long.</p>
-        <div class="tech-chips">
-          <span class="chip">Python</span>
-          <span class="chip">HubSpot API</span>
-          <span class="chip">Hunter.io</span>
-          <span class="chip">Perplexity</span>
-        </div>
-        <div class="card-actions">
-          <a href="demo-sales-rep.html" target="_blank" class="btn-demo-sm">View report ↗</a>
-          <button class="btn-expand" onclick="toggleDetail('salesrep', this)">Details ↓</button>
-        </div>
-      </div>
-
-    </div><!-- /projects-grid -->
-
-    <!-- ── Detail Panels ── -->
-    <div class="project-details-wrap">
-
-      <!-- AIOS Detail -->
-      <div class="detail-panel" id="detail-aios">
-        <div class="detail-inner">
-          <div class="detail-cols">
-            <div class="detail-col">
-              <h4>The Problem</h4>
-              <p>Managing a high-value industrial sales territory — $150K–$600K system sales with 6–18 month cycles — requires constant context-switching between CRM, prospect research, competitive intelligence, and technical documentation. The manual overhead was eating into time better spent with customers.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Solution</h4>
-              <p>A complete personal AI Operating System: a structured knowledge base paired with Claude Code agents that run prospect research, CRM updates, weekly reporting, and competitive analysis automatically. Five specialized agents cover the full territory intelligence workflow every week — no manual trigger required.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Results</h4>
-              <p>Prospect research time cut from 2+ hours to under 20 minutes per week. HubSpot stays current without manual entry. Weekly territory intelligence arrives automatically every Monday morning. More time with customers, less time on admin.</p>
-            </div>
-          </div>
-          <div class="results-strip">
-            <div class="result-item"><div class="result-num">85%</div><div class="result-lbl">Less research time weekly</div></div>
-            <div class="result-item"><div class="result-num">5</div><div class="result-lbl">Specialized AI agents</div></div>
-            <div class="result-item"><div class="result-num">11</div><div class="result-lbl">States covered automatically</div></div>
-            <div class="result-item"><div class="result-num">0</div><div class="result-lbl">Manual CRM entries required</div></div>
+      <div class="carwrap">
+        <dl class="car">
+          <div><dt>Problem</dt><dd>No defensible seconds-per-part, so no way to size the system or
+            stage the investment.</dd></div>
+          <div><dt>Approach</dt><dd>Modeled every seam on four representative beam parts, weighted
+            the average toward the highest runner, and built the capacity case around it.</dd></div>
+          <div><dt>Result</dt><dd>A phased path from <b>1,200 to 7,200 parts per week</b>, with each
+            phase justified by its own throughput math rather than a sales estimate.</dd></div>
+        </dl>
+        <div>
+          <div class="scroller"><table class="tt">
+            <caption>Cycle time by part &mdash; 100% arc-on, conservative</caption>
+            <thead><tr><th>Part</th><th>Seams</th><th>Weld length</th><th>Cycle</th></tr></thead>
+            <tbody>
+              <tr><td>Beam, chamber upper</td><td>8</td><td>32 in</td><td class="hot">3:07</td></tr>
+              <tr><td>Beam, water aisle upper</td><td>10</td><td>86 in</td><td>5:50</td></tr>
+              <tr><td>Beam, water aisle upper</td><td>14</td><td>184 in</td><td>10:45</td></tr>
+              <tr><td>Beam, water aisle upper</td><td>14</td><td>184 in</td><td>10:45</td></tr>
+            </tbody>
+            <tfoot><tr><td class="k">Weighted average</td><td></td><td></td>
+              <td><b>6:43</b> / part</td></tr></tfoot>
+          </table></div>
+          <div class="ramp">
+            <div class="row"><span class="lab">Manual today</span>
+              <span class="bar"><i style="width:16.7%"></i></span><span class="n">1,200</span></div>
+            <div class="row"><span class="lab">+ one robot cell</span>
+              <span class="bar"><i style="width:26.5%"></i></span><span class="n">1,910</span></div>
+            <div class="row goal"><span class="lab">Phase 1 semi-auto</span>
+              <span class="bar"><i style="width:58.3%"></i></span><span class="n">4,200</span></div>
+            <div class="row goal"><span class="lab">Phase 2 full auto</span>
+              <span class="bar"><i style="width:100%"></i></span><span class="n">7,200</span></div>
+            <div class="row"><span class="lab"></span>
+              <span class="n mono" style="text-align:left;grid-column:2/4">Parts per week</span></div>
           </div>
         </div>
       </div>
+      <div class="skills"><span>Weld-by-weld modeling</span><span>Capacity planning</span>
+        <span>Customer presentation</span><span>Phased proposal</span></div>
+    </article>
 
-      <!-- Trainer Detail -->
-      <div class="detail-panel" id="detail-trainer">
-        <div class="detail-inner">
-          <div class="detail-cols">
-            <div class="detail-col">
-              <h4>The Problem</h4>
-              <p>A global industrial OEM had 111 service manuals but no structured training program. Technicians learned by shadowing experienced engineers — creating dangerous single points of failure, wildly inconsistent service quality, and a knowledge base that could walk out the door at any time.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Solution</h4>
-              <p>Designed a 12-bucket modular training architecture and built 84+ interactive HTML training modules covering safety, welding fundamentals, robotic systems, programming, and advanced diagnostics. Role-based learning paths for technicians, sales engineers, project managers, and service leads. Built to plug into any LMS.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Results</h4>
-              <p>84 modules complete across 5 training buckets. Every module follows the same interaction design and brand standards. New technicians now follow a defined path instead of shadowing whoever is available. Consistent training regardless of location or senior engineer availability.</p>
-            </div>
-          </div>
-          <div class="results-strip">
-            <div class="result-item"><div class="result-num">84+</div><div class="result-lbl">Training modules built</div></div>
-            <div class="result-item"><div class="result-num">12</div><div class="result-lbl">Knowledge buckets</div></div>
-            <div class="result-item"><div class="result-num">4</div><div class="result-lbl">Role-based learning paths</div></div>
-            <div class="result-item"><div class="result-num">111</div><div class="result-lbl">Source manuals synthesized</div></div>
-          </div>
+    <!-- 03 -->
+    <article class="case">
+      <div class="casehd">
+        <div class="cnum">03</div>
+        <div>
+          <div class="tagrow"><span class="prov live">Live &middot; in design</span>
+            <span class="ctype">Design optimization</span><span class="ctype">Customer development</span></div>
+          <h3>The line I'm optimizing right now</h3>
+          <p>This is the system behind case 02, and it is not finished, not sold, and not a
+            retrospective. <b>I'm the sales engineer on it</b>: optimizing the design against the
+            customer's real part mix and running the technical relationship while it's still moving.</p>
         </div>
       </div>
 
-      <!-- Gmail Detail -->
-      <div class="detail-panel" id="detail-gmail">
-        <div class="detail-inner">
-          <div class="detail-cols">
-            <div class="detail-col">
-              <h4>The Problem</h4>
-              <p>A service team receiving high volumes of technical support emails had no consistent process for drafting replies. Responses were slow, knowledge was siloed, and senior engineers were constantly interrupted for questions the documentation already answered.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Solution</h4>
-              <p>An N8N cloud workflow monitors Gmail every 15 minutes, classifies incoming support emails, embeds questions via Gemini, searches a Pinecone vector knowledge base, and creates a Claude-drafted reply directly in Gmail Drafts. A human reviews every draft before sending — the system never auto-sends.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Results</h4>
-              <p>Eliminates blank-page syndrome for support replies. Draft quality validated at 85%+ accuracy against the knowledge base. Response time reduced from hours to minutes. Senior engineers freed from tier-1 support entirely.</p>
-            </div>
-          </div>
-          <div class="results-strip">
-            <div class="result-item"><div class="result-num">15min</div><div class="result-lbl">Polling interval</div></div>
-            <div class="result-item"><div class="result-num">85%+</div><div class="result-lbl">Draft accuracy</div></div>
-            <div class="result-item"><div class="result-num">5</div><div class="result-lbl">APIs integrated</div></div>
-            <div class="result-item"><div class="result-num">0</div><div class="result-lbl">Auto-sends (human always reviews)</div></div>
-          </div>
-        </div>
+      <figure class="plate" style="margin-top:1.75rem">
+        <video preload="metadata" src="assets/wolf-line-loop.mp4" poster="assets/wolf-sim-a.jpg" autoplay muted loop playsinline controls
+               style="display:block;width:100%"
+               aria-label="Offline programming simulation of a multi-robot structural steel welding line, showing welding and handling robots, gantry positioners, roller conveyors and buffer tables inside safety fencing"></video>
+        <figcaption class="cap">
+          <span>Offline simulation &middot; current design iteration</span>
+          <span><b>Welding and handling robots &middot; gantry positioners &middot; buffered infeed</b></span>
+        </figcaption>
+      </figure>
+
+      <div class="carwrap onecol">
+        <dl class="car">
+          <div><dt>Where it is</dt><dd>In design optimization with the customer. Cycle simulated,
+            layout iterating, <b>no PO yet</b>.</dd></div>
+          <div><dt>My role</dt><dd>Sales engineer. Feasibility, cycle time, layout optimization
+            against the actual part mix, and every technical conversation with the customer.</dd></div>
+          <div><dt>What I'm solving</dt><dd>Making the buffering and handling keep the welding
+            robots fed, so the throughput case from case 02 survives contact with real parts
+            rather than only holding on paper.</dd></div>
+        </dl>
       </div>
+      <div class="skills"><span>Offline simulation review</span><span>Layout optimization</span>
+        <span>Throughput validation</span><span>Customer technical lead</span></div>
+    </article>
 
-      <!-- Chatbot Detail -->
-      <div class="detail-panel" id="detail-chatbot">
-        <div class="detail-inner">
-          <div class="detail-cols">
-            <div class="detail-col">
-              <h4>The Problem</h4>
-              <p>Service technicians fielding complex troubleshooting questions in the field had no fast access to institutional knowledge. 111 dense manuals were inaccessible under pressure. Senior engineers fielded the same questions on repeat — interrupting deep work for problems already documented.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Solution</h4>
-              <p>A conversational AI assistant built on RAG (Retrieval-Augmented Generation) — trained on the full service knowledge base across 12 product domains. Technicians ask plain-English troubleshooting questions and receive step-by-step guidance drawn directly from official documentation, referenced and sourced.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Results</h4>
-              <p>Complete and deployed. Retrieval accuracy validated across all 12 product and service domains. Technicians get accurate answers in seconds from their phone. Senior engineers now focus on real escalations, not tier-1 questions.</p>
-            </div>
-          </div>
-          <div class="results-strip">
-            <div class="result-item"><div class="result-num">12</div><div class="result-lbl">Knowledge domains covered</div></div>
-            <div class="result-item"><div class="result-num">111</div><div class="result-lbl">Source manuals ingested</div></div>
-            <div class="result-item"><div class="result-num">&lt;3s</div><div class="result-lbl">Average response time</div></div>
-            <div class="result-item"><div class="result-num">100%</div><div class="result-lbl">Answers sourced from official docs</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sales Rep Detail -->
-      <div class="detail-panel" id="detail-salesrep">
-        <div class="detail-inner">
-          <div class="detail-cols">
-            <div class="detail-col">
-              <h4>The Problem</h4>
-              <p>Covering an 11-state territory manually meant inconsistent prospect coverage, slow CRM updates, and missed opportunities in long-cycle industrial sales. Researching a single target company took 2+ hours. Most weeks, it didn't happen at all.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Solution</h4>
-              <p>An autonomous weekly prospect scanner: pulls company data, qualifies against ICP criteria, finds verified contacts via Hunter.io, researches buying signals via Perplexity, and writes contacts directly into HubSpot. Zero manual entry. Outputs a clean weekly HTML intelligence report every Monday morning.</p>
-            </div>
-            <div class="detail-col">
-              <h4>The Results</h4>
-              <p>Running weekly across all 11 states. HubSpot stays current automatically. Outreach volume up 3x with no additional time investment. Every prospect is pre-qualified before a human ever reviews the list.</p>
-            </div>
-          </div>
-          <div class="results-strip">
-            <div class="result-item"><div class="result-num">3×</div><div class="result-lbl">Outreach volume increase</div></div>
-            <div class="result-item"><div class="result-num">11</div><div class="result-lbl">States covered weekly</div></div>
-            <div class="result-item"><div class="result-num">0</div><div class="result-lbl">Manual CRM entries</div></div>
-            <div class="result-item"><div class="result-num">4</div><div class="result-lbl">APIs orchestrated</div></div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /project-details-wrap -->
-
-  </div><!-- /container -->
-</section>
-
-<!-- ── SERVICES / CTA ── -->
-<section id="services">
-  <div class="container">
-    <div class="section-tag">// WORK WITH ME</div>
-    <h2 class="section-h">Want this for your business?</h2>
-    <p class="section-sub">I build AI automation systems for companies tired of doing repetitive, manual, expensive-to-scale work.</p>
-
-    <div class="services-tags">
-      <div class="svc-tag">Workflow automation</div>
-      <div class="svc-tag">AI document tools</div>
-      <div class="svc-tag">Training systems</div>
-      <div class="svc-tag">Sales intelligence</div>
-      <div class="svc-tag">Custom AI chatbots</div>
-      <div class="svc-tag">CRM integration</div>
-    </div>
-
-    <div class="cta-card reveal">
-      <h3>Let's build something that works.</h3>
-      <p>No prototypes. No demos. Production-grade AI automation tailored to your specific business processes — built, tested, and shipped.</p>
-      <div class="cta-btns">
-        <a href="mailto:cameronmontbriand@gmail.com" class="btn btn-primary">Get in touch →</a>
-        <a href="https://www.linkedin.com/in/cameron-montbriand-ab685216b/" target="_blank" rel="noopener" class="btn btn-ghost">Connect on LinkedIn ↗</a>
+    <div class="more">
+      <h4 class="mono">More layouts</h4>
+      <div class="morerow">
+        <figure class="plate" style="margin:0">
+          <img loading="lazy" decoding="async" src="assets/dwg-compact.jpg" alt="Layout drawing of a compact single-robot welding cell">
+          <figcaption class="cap"><span>Compact cell &middot; cable tray manufacturer</span></figcaption>
+        </figure>
+        <p>Around sixty cell layouts sit behind this page across heavy equipment, material handling,
+          cable tray, agriculture and structural steel. Most carry customer geometry and stay
+          private. <b>Happy to walk through more of them in a conversation.</b></p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── FOOTER ── -->
-<footer>
-  <div class="footer-brand">
-    <svg viewBox="0 0 100 100" fill="none" aria-hidden="true"><rect x="10" y="32" width="58" height="58" rx="7" fill="#2DD4BF"/><rect x="32" y="10" width="58" height="58" rx="7" fill="none" stroke="#2DD4BF" stroke-width="4"/></svg>
-    <span class="wm">RUNWELL CO.</span>
-    <span class="pipe">|</span>
-    <span class="tag">AI AUTOMATION</span>
+<section class="sec" id="floor">
+  <div class="shell">
+    <div class="sechd"><h2>On the floor</h2><span class="mono">Where the drawings get tested</span></div>
+    <div class="floor">
+      <figure class="ph">
+        <img loading="lazy" decoding="async" src="assets/photo-arc.jpg" alt="A robot welding a circular workpiece on a positioner, arc struck and sparks flying, with an operator holding a teach pendant in the foreground">
+        <figcaption>Arc on &mdash; runoff of a positioner-mounted part</figcaption>
+      </figure>
+      <div class="floorcol">
+        <figure class="ph">
+          <video preload="metadata" src="assets/floor-line-loop.mp4" poster="assets/floor-line-poster.jpg" autoplay muted loop playsinline controls
+                 aria-label="A row of robotic welding cells with headstock positioners on a shop floor, overhead crane above, panning across the installation"></video>
+          <figcaption>Customer system on test &mdash; runoff before shipment</figcaption>
+        </figure>
+        <figure class="ph">
+          <img loading="lazy" decoding="async" src="assets/photo-pendant.jpg" alt="A hand holding a CLOOS QIROX QPHG 2 teach pendant, program list obscured">
+          <figcaption>The real QPHG 2 &mdash; program list obscured</figcaption>
+        </figure>
+      </div>
+    </div>
   </div>
-  <div class="footer-links">
-    <a href="https://www.linkedin.com/in/cameron-montbriand-ab685216b/" target="_blank" rel="noopener">LinkedIn</a>
-    <a href="mailto:cameronmontbriand@gmail.com">Email</a>
-    <a href="#projects">Projects</a>
+</section>
+
+<section class="sec" id="caps">
+  <div class="shell">
+    <div class="sechd"><h2>Capabilities</h2><span class="mono">With the context, not a word cloud</span></div>
+    <div class="caps">
+      <div>
+        <h4>Design and CAD</h4>
+        <ul>
+          <li><b>SolidWorks</b> &mdash; 60+ cell layouts and fixture concepts, four years daily</li>
+          <li><b>AutoCAD, Creo</b> &mdash; customer drawing exchange and part review</li>
+          <li><b>GD&amp;T and tolerance analysis</b> &mdash; from switchgear design at G&amp;W</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Feasibility</h4>
+        <ul>
+          <li><b>Reach studies</b> &mdash; envelope and weld-access analysis before quote</li>
+          <li><b>Cycle time modeling</b> &mdash; seam by seam to a defensible parts-per-hour</li>
+          <li><b>Throughput and takt</b> &mdash; capacity cases customers can audit</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Commercial</h4>
+        <ul>
+          <li><b>Cost models and quotes</b> &mdash; built the internal quoting workbook</li>
+          <li><b>Technical proposals</b> &mdash; scope, compliance, engineering change orders</li>
+          <li><b>PO negotiation</b> &mdash; closing while protecting margin</li>
+        </ul>
+      </div>
+      <div>
+        <h4>On site</h4>
+        <ul>
+          <li><b>Commissioning and runoff</b> &mdash; procedures and customer acceptance</li>
+          <li><b>Field implementation</b> &mdash; 200+ systems directed at G&amp;W Electric</li>
+          <li><b>Floor feasibility</b> &mdash; judging accuracy, throughput and risk in production</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="footer-copy">© 2026 RUNWELL CO.</div>
-</footer>
+</section>
 
-<script>
-  // ── Video Intro ──
-  (function() {
-    var wrapper = document.getElementById('videoWrapper');
-    var frame   = document.getElementById('introFrame');
-    var controls = document.getElementById('videoControls');
-    var skipEl  = document.getElementById('skipEarly');
-    var skipTimer, endTimer;
+<section class="band" id="ai">
+  <div class="shell">
+    <div class="sechd"><h2>Systems I built to do my own job faster</h2>
+      <span class="mono">Claude Code &middot; WebGL &middot; RAG</span></div>
+    <p class="lede">Engineering is the job. These came out of doing it and getting tired of the
+      manual parts. All of them run in production.</p>
 
-    function scaleVideo() {
-      var scale = window.innerWidth / 1920;
-      var h = Math.round(1080 * scale);
-      frame.style.transform = 'scale(' + scale + ')';
-      wrapper.style.height = h + 'px';
-    }
-    scaleVideo();
-    window.addEventListener('resize', scaleVideo);
+    <div class="feature">
+      <figure class="featshot">
+        <img loading="lazy" decoding="async" src="assets/trainer-screen.jpg" alt="Screenshot of the Pendant Trainer: a 3D orange QIROX robot with a welding torch positioned over a T-joint on a table, beside a full recreation of the QPHG 2 teach pendant showing the program manager screen, key switch and keypad">
+      </figure>
+      <div class="featgrid">
+        <div>
+          <span class="mono">Interactive &middot; runs in your browser</span>
+          <h3>Pendant Trainer</h3>
+          <p>A working simulator of the QIROX teach pendant. Power up, jog the robot in joint or
+            cartesian mode, teach points, step the program, and weld a T-joint &mdash; with the
+            hold-to-enable deadman enforced the way the real one enforces it.</p>
+          <a class="btn light" href="pendant-trainer.html" target="_blank" rel="noopener">Launch the simulator</a>
+        </div>
+        <ul class="featlist">
+          <li>Robot geometry taken from the <b>actual QRC 350 CAD model</b>, not an approximation</li>
+          <li>Every key function verified against the QIROX manual, chapter and page</li>
+          <li>Four guided missions, so someone who has never touched a pendant can still finish a weld</li>
+          <li>One self-contained file. No install, no login, works on a tablet</li>
+        </ul>
+      </div>
+    </div>
 
-    skipTimer = setTimeout(function() { skipEl.classList.add('show'); }, 3000);
-    endTimer  = setTimeout(function() {
-      controls.classList.add('show');
-      skipEl.classList.remove('show');
-    }, 35500);
+    <div class="aigrid">
+      <div class="ai"><span class="mono">Training</span>
+        <h4>Module generator</h4>
+        <p>84 interactive training modules generated from 111 service manuals across 12 buckets.
+          Replaced $10K+ in vendor-quoted production.</p></div>
+      <div class="ai"><span class="mono">Service</span>
+        <h4>Service chatbot</h4>
+        <p>111 manuals indexed with RAG. Technicians get step-by-step fault resolution in plain
+          English instead of searching PDFs.</p></div>
+      <div class="ai"><span class="mono">Sales</span>
+        <h4>Prospecting pipeline</h4>
+        <p>Five-agent research pipeline across 11 states. Qualifies companies, maps contacts, syncs
+          to HubSpot. Returns about 10 hours a week.</p></div>
+      <div class="ai"><span class="mono">Support</span>
+        <h4>Inbox triage agent</h4>
+        <p>Monitors the support inbox, searches the knowledge base, drafts replies for human review
+          before sending. About 4 hours a week back.</p></div>
+    </div>
+  </div>
+</section>
 
-    window.replayIntro = function() {
-      controls.classList.remove('show');
-      skipEl.classList.remove('show');
-      clearTimeout(skipTimer); clearTimeout(endTimer);
-      frame.src = frame.src;
-      skipTimer = setTimeout(function() { skipEl.classList.add('show'); }, 3000);
-      endTimer  = setTimeout(function() {
-        controls.classList.add('show');
-        skipEl.classList.remove('show');
-      }, 35500);
-    };
-  })();
+<section class="sec" id="about">
+  <div class="shell">
+    <div class="sechd"><h2>About</h2><span class="mono">Evanston, IL</span></div>
+    <div class="about">
+      <div>
+        <p>I'm a mechanical engineer who ended up in front of customers, which turned out to be the
+          right place. <b>The interesting problems show up on factory floors</b>, not in a CAD window,
+          and you only find them by standing in the plant asking what actually goes wrong.</p>
+        <p>I started at G&amp;W Electric designing mechanical actuating systems for switchgear to
+          IEEE standards, and directed field repair and implementation on more than 200 systems.
+          That taught me what happens to a design after it leaves the drawing.</p>
+        <p>Now I own customer projects end to end at Cloos North America: technical discovery,
+          feasibility, layout, reach and cycle time studies, quoting, and commissioning support.
+          I drove 80% of company sales in 2025 and 100% in 2026, including $12M with a single
+          industrial customer.</p>
+        <p>BS Mechanical Engineering, University of Iowa, 3.54. Outside work it's hiking, skiing,
+          and finding out what else Claude Code can be talked into building.</p>
+      </div>
+    </div>
 
-  // ── Typewriter ──
-  const phrases = [
-    "Prospect research — automated.",
-    "Support emails — pre-drafted by AI.",
-    "Training systems — built to scale.",
-    "CRM updates — zero manual entry.",
-    "Service docs — AI-polished in seconds."
-  ];
-  let pIdx = 0, cIdx = 0, deleting = false;
-  const tw = document.getElementById('typewriter-text');
+    <div class="contact" id="contact">
+      <h2>If you're automating something that has to weld, I'd like to hear about it.</h2>
+      <div class="clinks">
+        <a class="btn" href="mailto:cameronmontbriand@gmail.com">cameronmontbriand@gmail.com</a>
+        <a class="btn ghost" href="https://www.linkedin.com/in/cameron-montbriand-ab685216b">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-  function tick() {
-    const phrase = phrases[pIdx];
-    if (!deleting) {
-      tw.textContent = phrase.slice(0, ++cIdx);
-      if (cIdx === phrase.length) {
-        deleting = true;
-        return setTimeout(tick, 2200);
-      }
-    } else {
-      tw.textContent = phrase.slice(0, --cIdx);
-      if (cIdx === 0) {
-        deleting = false;
-        pIdx = (pIdx + 1) % phrases.length;
-      }
-    }
-    setTimeout(tick, deleting ? 38 : 68);
-  }
-  tick();
-
-  // ── Detail Accordion ──
-  function toggleDetail(id, btn) {
-    const panel = document.getElementById('detail-' + id);
-    const isOpen = panel.classList.contains('visible');
-
-    document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('visible'));
-    document.querySelectorAll('.btn-expand').forEach(b => {
-      b.textContent = 'Details ↓';
-      b.classList.remove('open');
-    });
-
-    if (!isOpen) {
-      panel.classList.add('visible');
-      btn.textContent = 'Details ↑';
-      btn.classList.add('open');
-      setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
-    }
-  }
-
-  // ── Scroll Reveal ──
-  const revealEls = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('vis'), i * 80);
-        io.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.08 });
-  revealEls.forEach(el => io.observe(el));
-</script>
+</main>
 </body>
 </html>
