@@ -164,8 +164,8 @@
   .ph img,.ph video{width:100%;display:block}
 
   /* capabilities */
-  .caps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0}
-  .caps > div{border-left:1px solid var(--rule);padding:0 1.5rem 1.75rem}
+  .caps{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:0 0}
+  .caps > div{border-left:1px solid var(--rule);padding:0 1.15rem 1.75rem}
   .caps > div:first-child{border-left:0;padding-left:0}
   .caps h4{font-family:var(--mono);font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;
            color:var(--deep);margin-bottom:.8rem}
@@ -239,7 +239,7 @@
     <div class="brand">Cameron Montbriand<span class="mono">Application engineer</span></div>
     <nav class="navlinks mono">
       <a href="#work">Work</a><a href="#floor">On the floor</a><a href="#caps">Capabilities</a>
-      <a href="#ai">AI</a><a href="#about">About</a><a href="#contact">Contact</a>
+      <a href="#ai">AI</a><a href="#about">About</a><a href="Cameron-Montbriand-Resume.pdf">Resume</a><a href="#contact">Contact</a>
     </nav>
   </div>
 </header>
@@ -457,38 +457,50 @@
     <div class="sechd"><h2>Capabilities</h2><span class="mono">With the context, not a word cloud</span></div>
     <div class="caps">
       <div>
-        <h4>Design and CAD</h4>
+        <h4>Robotic welding applications</h4>
+        <ul>
+          <li><b>GMAW and FCAW</b> &mdash; process selection against joint, position and material</li>
+          <li><b>Joint access and reach studies</b> &mdash; proven before the quote goes out</li>
+          <li><b>Weld symbology and print reading</b> &mdash; scoping weld length and consumables</li>
+          <li><b>Test coupons</b> &mdash; validating access and penetration before purchase</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Adaptive welding and sensing</h4>
+        <ul>
+          <li><b>Laser seam tracking and seam finding</b> &mdash; specified against real fit-up variation</li>
+          <li><b>Touch and arc sensing</b> &mdash; where fixed-path programs fail in heavy fabrication</li>
+          <li><b>3D scan to program</b> &mdash; program generation from the part as built</li>
+          <li><b>Offline programming and simulation</b> &mdash; cycle proven before the floor is poured</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Design, CAD and analysis</h4>
         <ul>
           <li><b>SolidWorks</b> &mdash; 60+ cell layouts and fixture concepts, four years daily</li>
           <li><b>AutoCAD, Creo</b> &mdash; customer drawing exchange and part review</li>
           <li><b>GD&amp;T and tolerance analysis</b> &mdash; from switchgear design at G&amp;W</li>
+          <li><b>FEA and MATLAB</b> &mdash; ANSYS, Abaqus, multi-physics modelling</li>
         </ul>
       </div>
       <div>
-        <h4>Feasibility</h4>
+        <h4>Technical pre-sales</h4>
         <ul>
-          <li><b>Reach studies</b> &mdash; envelope and weld-access analysis before quote</li>
-          <li><b>Cycle time modeling</b> &mdash; seam by seam to a defensible parts-per-hour</li>
-          <li><b>Throughput and takt</b> &mdash; capacity cases customers can audit</li>
-        </ul>
-      </div>
-      <div>
-        <h4>Commercial</h4>
-        <ul>
+          <li><b>Discovery and as-is analysis</b> &mdash; on the customer's floor, not over email</li>
+          <li><b>Cycle time and throughput</b> &mdash; capacity cases customers can audit</li>
           <li><b>Cost models and quotes</b> &mdash; built the internal quoting workbook</li>
-          <li><b>Technical proposals</b> &mdash; scope, compliance, engineering change orders</li>
-          <li><b>PO negotiation</b> &mdash; closing while protecting margin</li>
+          <li><b>Pipeline ownership</b> &mdash; discovery to close in HubSpot</li>
         </ul>
       </div>
       <div>
         <h4>On site</h4>
         <ul>
-          <li><b>Commissioning and runoff</b> &mdash; procedures and customer acceptance</li>
+          <li><b>Demos and runoff</b> &mdash; live demonstrations and customer acceptance</li>
+          <li><b>Commissioning support</b> &mdash; procedures and site prep</li>
           <li><b>Field implementation</b> &mdash; 200+ systems directed at G&amp;W Electric</li>
           <li><b>Floor feasibility</b> &mdash; judging accuracy, throughput and risk in production</li>
         </ul>
       </div>
-    </div>
   </div>
 </section>
 
@@ -534,6 +546,10 @@
         <h4>Prospecting pipeline</h4>
         <p>Five-agent research pipeline across 11 states. Qualifies companies, maps contacts, syncs
           to HubSpot. Returns about 10 hours a week.</p></div>
+      <div class="ai"><span class="mono">Estimating</span>
+        <h4>BOM Creator</h4>
+        <p>Reads steel fabrication drawings with a vision model and writes a structured bill of
+          materials to Excel, replacing manual takeoff from prints.</p></div>
       <div class="ai"><span class="mono">Support</span>
         <h4>Inbox triage agent</h4>
         <p>Monitors the support inbox, searches the knowledge base, drafts replies for human review
@@ -567,6 +583,7 @@
       <div class="clinks">
         <a class="btn" href="mailto:cameronmontbriand@gmail.com">cameronmontbriand@gmail.com</a>
         <a class="btn ghost" href="https://www.linkedin.com/in/cameron-montbriand-ab685216b">LinkedIn</a>
+        <a class="btn ghost" href="Cameron-Montbriand-Resume.pdf" download>Download resume (PDF)</a>
       </div>
     </div>
   </div>
